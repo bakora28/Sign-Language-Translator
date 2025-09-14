@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Sign Up - tawasol</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" type="image/png" href="static/log.png">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://www.microsoft.com/en-us/research/uploads/prod/2023/11/SLD-BlogHeroFeature-1400x788-1.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            color: #333;
+            min-height: 100vh;
+            padding-top: 120px;
+            padding-bottom: 60px;
+        }
+        header {
+            background-color: rgba(0, 123, 255, 0.9);
+            color: white;
+            padding: 40px 15px;
+            border-bottom: 2px solid #0056b3;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+        }
+        footer {
+            background-color: rgba(51, 51, 51, 0.9);
+            color: white;
+            padding: 10px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-links {
+            margin-left: 20px;
+        }
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .password-requirements {
+            font-size: 12px;
+            color: gray;
+            margin-top: 5px;
+        }
+        .lang-btn {
+            background: #0056b3;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            height: 40px;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .lang-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .lang-login-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            padding: 2rem;
+        }
+        .card h2 {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+        <header>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="static/log.png" alt="Logo" style="width: 80px; height: 60px; border-radius: 0%;">
+            <a href="/ENhome" style="text-decoration: none; font-size: 35px; font-weight: bold; color: #ffffff;">
+                tawasol
+            </a>
+        </div>
+
+        <div class="lang-login-container">
+            <a href="/ARsignup" class="lang-btn">عربي</a>
+        </div>
+    </header>
+       <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <h2 class="text-center mb-4">Create New Account</h2>
+                    <form method="POST" action="/ENsignup">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="password-requirements">
+Password must be at least 6 characters long
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Create Account</button>
+                        {% if error %}
+                            <p class="error-message mt-3">{{ error }}</p>
+                        {% endif %}
+                    </form>
+                    
+                    <p class="text-center mt-4">Already have an account? <a href="/ENlogin" style="color: #007bff;">Log in now</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+        <footer>
+        <p>&copy; 2025 tawasol. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="/ENprivacy">Privacy Policy</a>
+            <a href="/ENabout">About</a>
+        </div>
+    </footer>
+    </body>
+</html>

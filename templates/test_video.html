@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <title>اختبار تواصل</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        direction: rtl;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #202124;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+      }
+      .video-section {
+        flex: 3;
+        background-color: #ffffff;
+        padding: 10px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      #timer {
+        font-size: 16px;
+        font-weight: bold;
+        color: #000000;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #status {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      #video-feed {
+        width: 100%;
+        height: calc(100% - 90px);
+        background-color: #757575;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      #local-video,
+      #remote-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #video-placeholder {
+        max-width: 200px;
+        max-height: 200px;
+        color: white;
+      }
+      .video-overlay {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: 200px;
+        height: 150px;
+        background-color: #333;
+        border-radius: 4px;
+        overflow: hidden;
+        z-index: 10;
+      }
+      .controls {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .controls button {
+        padding: 8px 12px;
+        background-color: #ffffff;
+        color: #202124;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 100px;
+        justify-content: center;
+      }
+      .controls button:hover {
+        background-color: #e8f0fe;
+      }
+      .controls .red {
+        background-color: #c5221f;
+        color: white;
+      }
+      .controls .red:hover {
+        background-color: #a50e0b;
+      }
+      .controls .active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        border-color: #1a73e8;
+      }
+      .controls .blue {
+        background-color: #1a73e8;
+        color: white;
+      }
+      .controls .blue:hover {
+        background-color: #1557b0;
+      }
+      .chat-section {
+        flex: 1;
+        background-color: #ffffff;
+        padding: 10px;
+        border-left: 1px solid #dadce0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .chat-input-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      #chat-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        background-color: #f1f3f4;
+        margin-bottom: 0;
+        font-size: 14px;
+      }
+      #send-btn {
+        padding: 10px 20px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #send-btn:hover {
+        background-color: #1557b0;
+      }
+      .gif-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-height: 60%;
+      }
+      .gif-container img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin: 5px 0;
+      }
+      .translation-section {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        margin-top: 10px;
+        max-height: 40%;
+        border: 1px solid #dadce0;
+      }
+      .translation-message {
+        margin: 5px 0;
+        padding: 8px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .translation-message.local {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        text-align: left;
+      }
+      .translation-message.remote {
+        background-color: #f1f3f4;
+        text-align: right;
+      }
+      .hidden {
+        display: none;
+      }
+      .info-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="video-section">
+        <div id="timer">
+          <span>00:00</span>
+          <span id="status">اختبار - في انتظار الاتصال</span>
+        </div>
+        <div id="video-feed">
+          <div id="video-placeholder">في انتظار الفيديو...</div>
+          <video id="remote-video" autoplay playsinline class="hidden"></video>
+          <div class="video-overlay">
+            <video
+              id="local-video"
+              autoplay
+              playsinline
+              muted
+              class="hidden"
+            ></video>
+          </div>
+          <div class="info-panel">
+            <div>المستخدم: {{ user.username if user else 'غير معروف' }}</div>
+            <div>UID: {{ user.uid if user else 'غير معروف' }}</div>
+            <div>الغرفة: {{ test_room }}</div>
+            <div>المبادر: {{ 'نعم' if is_initiator else 'لا' }}</div>
+          </div>
+        </div>
+        <div class="controls">
+          <button id="mic-btn" class="blue" onclick="toggleMic()">
+            <span id="mic-icon">🎤</span>
+            <span id="mic-text">إغلاق الميكروفون</span>
+          </button>
+          <button id="camera-btn" class="blue" onclick="toggleCamera()">
+            <span id="camera-icon">📷</span>
+            <span id="camera-text">إغلاق الكاميرا</span>
+          </button>
+          <button id="end-call-btn" class="red" onclick="endCall()">
+            <span>📞</span> إنهاء المكالمة
+          </button>
+        </div>
+      </div>
+      <div class="chat-section">
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا..." />
+          <button id="send-btn">إرسال</button>
+        </div>
+        <div class="gif-container" id="gif-container">
+          <div id="gif-placeholder">سيتم عرض GIFs هنا عند إرسال رسالة</div>
+        </div>
+        <div class="translation-section" id="translation-container">
+          <div id="translation-placeholder">سيتم عرض ترجمة لغة الإشارة هنا</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      // Test configuration
+      const testRoom = "{{ test_room }}";
+      const currentUserUid = "{{ user.uid if user else '' }}";
+      const otherUserUid = "{{ other_user_uid }}";
+      const isInitiator = {{ 'true' if is_initiator else 'false' }};
+
+      console.log('Test Video Configuration:', {
+          testRoom,
+          currentUserUid,
+          otherUserUid,
+          isInitiator
+      });
+
+      // WebRTC configuration
+      let peerConnection;
+      const iceServers = {
+          iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' }
+          ]
+      };
+
+      // Socket and video elements
+      const socket = io('/video');
+      let localVideo = document.getElementById('local-video');
+      let remoteVideo = document.getElementById('remote-video');
+      let statusElement = document.getElementById('status');
+      let timerElement = document.getElementById('timer');
+      let chatInput = document.getElementById('chat-input');
+      let sendBtn = document.getElementById('send-btn');
+      let gifContainer = document.getElementById('gif-container');
+      let translationContainer = document.getElementById('translation-container');
+
+      // State variables
+      let localStream = null;
+      let isMicMuted = false;
+      let isCameraOff = false;
+      let callTime = 0;
+      let timerInterval;
+      let remoteUserSid = null;
+
+      // Initialize
+      socket.on('connect', () => {
+          console.log('Connected to /video namespace');
+          statusElement.textContent = 'متصل - في انتظار إعداد الكاميرا';
+
+          initVideoCall().then(() => {
+              statusElement.textContent = 'جاهز - انضمام للغرفة';
+              joinTestRoom();
+          }).catch(error => {
+              console.error('Error initializing video:', error);
+              statusElement.textContent = 'خطأ في إعداد الكاميرا';
+          });
+      });
+
+      async function initVideoCall() {
+          try {
+              localStream = await navigator.mediaDevices.getUserMedia({
+                  video: true,
+                  audio: true
+              });
+
+              localVideo.srcObject = localStream;
+              localVideo.classList.remove('hidden');
+              document.querySelector('.video-overlay').classList.remove('hidden');
+              document.getElementById('video-placeholder').style.display = 'none';
+
+              console.log('Local video initialized successfully');
+              return Promise.resolve();
+          } catch (error) {
+              console.error('Error accessing media devices:', error);
+              alert('تعذر الوصول إلى الكاميرا أو الميكروفون. يرجى التحقق من الأذونات.');
+              return Promise.reject(error);
+          }
+      }
+
+      function joinTestRoom() {
+          socket.emit('join_test_room', {
+              user_uid: currentUserUid,
+              test_room: testRoom
+          });
+      }
+
+      socket.on('test_room_ready', (data) => {
+          console.log('Test room ready:', data);
+          statusElement.textContent = 'الغرفة جاهزة';
+
+          if (data.can_initiate && isInitiator) {
+              statusElement.textContent = 'بدء الاتصال...';
+              setTimeout(() => {
+                  startCall();
+              }, 1000);
+          } else {
+              statusElement.textContent = 'في انتظار الاتصال...';
+          }
+      });
+
+      function createPeerConnection() {
+          peerConnection = new RTCPeerConnection(iceServers);
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => {
+                  peerConnection.addTrack(track, localStream);
+              });
+          }
+
+          peerConnection.onicecandidate = (event) => {
+              if (event.candidate) {
+                  socket.emit('ice_candidate', {
+                      candidate: event.candidate,
+                      target_sid: remoteUserSid || 'broadcast'
+                  });
+              }
+          };
+
+          peerConnection.ontrack = (event) => {
+              console.log('Received remote stream');
+              remoteVideo.srcObject = event.streams[0];
+              remoteVideo.classList.remove('hidden');
+              statusElement.textContent = 'متصل';
+              startTimer();
+          };
+
+          peerConnection.onconnectionstatechange = () => {
+              console.log('Connection state:', peerConnection.connectionState);
+              if (peerConnection.connectionState === 'connected') {
+                  statusElement.textContent = 'متصل بنجاح';
+              } else if (peerConnection.connectionState === 'disconnected') {
+                  statusElement.textContent = 'انقطع الاتصال';
+              }
+          };
+      }
+
+      async function startCall() {
+          console.log('Starting call as initiator');
+          createPeerConnection();
+
+          try {
+              const offer = await peerConnection.createOffer();
+              await peerConnection.setLocalDescription(offer);
+
+              socket.emit('offer', {
+                  offer: offer,
+                  target_sid: 'broadcast' // Send to all in room for testing
+              });
+
+              statusElement.textContent = 'تم إرسال العرض';
+          } catch (error) {
+              console.error('Error creating offer:', error);
+              statusElement.textContent = 'خطأ في إنشاء العرض';
+          }
+      }
+
+      socket.on('offer', async (data) => {
+          console.log('Received offer from:', data.sid);
+          if (data.sid !== socket.id) { // Don't process our own offer
+              remoteUserSid = data.sid;
+              createPeerConnection();
+
+              try {
+                  await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                  const answer = await peerConnection.createAnswer();
+                  await peerConnection.setLocalDescription(answer);
+
+                  socket.emit('answer', {
+                      answer: answer,
+                      target_sid: data.sid
+                  });
+
+                  statusElement.textContent = 'تم إرسال الإجابة';
+              } catch (error) {
+                  console.error('Error handling offer:', error);
+                  statusElement.textContent = 'خطأ في معالجة العرض';
+              }
+          }
+      });
+
+      socket.on('answer', async (data) => {
+          console.log('Received answer from:', data.sid);
+          try {
+              await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+              statusElement.textContent = 'تم قبول الإجابة';
+          } catch (error) {
+              console.error('Error handling answer:', error);
+              statusElement.textContent = 'خطأ في معالجة الإجابة';
+          }
+      });
+
+      socket.on('ice_candidate', async (data) => {
+          if (peerConnection && data.candidate) {
+              try {
+                  await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                  console.log('Added ICE candidate');
+              } catch (error) {
+                  console.error('Error adding ICE candidate:', error);
+              }
+          }
+      });
+
+      function startTimer() {
+          timerInterval = setInterval(() => {
+              callTime++;
+              const minutes = Math.floor(callTime / 60).toString().padStart(2, '0');
+              const seconds = (callTime % 60).toString().padStart(2, '0');
+              timerElement.children[0].textContent = `${minutes}:${seconds}`;
+          }, 1000);
+      }
+
+      function toggleMic() {
+          if (localStream) {
+              isMicMuted = !isMicMuted;
+              localStream.getAudioTracks().forEach(track => {
+                  track.enabled = !isMicMuted;
+              });
+
+              const micBtn = document.getElementById('mic-btn');
+              const micIcon = document.getElementById('mic-icon');
+              const micText = document.getElementById('mic-text');
+
+              if (isMicMuted) {
+                  micBtn.classList.add('active');
+                  micIcon.textContent = '🔇';
+                  micText.textContent = 'فتح الميكروفون';
+              } else {
+                  micBtn.classList.remove('active');
+                  micIcon.textContent = '🎤';
+                  micText.textContent = 'إغلاق الميكروفون';
+              }
+          }
+      }
+
+      function toggleCamera() {
+          if (localStream) {
+              isCameraOff = !isCameraOff;
+              localStream.getVideoTracks().forEach(track => {
+                  track.enabled = !isCameraOff;
+              });
+
+              const cameraBtn = document.getElementById('camera-btn');
+              const cameraIcon = document.getElementById('camera-icon');
+              const cameraText = document.getElementById('camera-text');
+
+              if (isCameraOff) {
+                  cameraBtn.classList.add('active');
+                  cameraIcon.textContent = '🚫';
+                  cameraText.textContent = 'فتح الكاميرا';
+              } else {
+                  cameraBtn.classList.remove('active');
+                  cameraIcon.textContent = '📷';
+                  cameraText.textContent = 'إغلاق الكاميرا';
+              }
+          }
+      }
+
+      function endCall() {
+          clearInterval(timerInterval);
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => track.stop());
+          }
+
+          if (peerConnection) {
+              peerConnection.close();
+          }
+
+          alert('تم إنهاء المكالمة');
+          window.location.href = '/ARhome';
+      }
+
+      // Chat functionality
+      socket.on('chat_response', (data) => {
+          console.log('Received chat response:', data);
+          gifContainer.innerHTML = '';
+          document.getElementById('gif-placeholder').classList.add('hidden');
+
+          if (data.gifs && data.gifs.length > 0) {
+              data.gifs.forEach((gifPath, index) => {
+                  setTimeout(() => {
+                      gifContainer.innerHTML = '';
+                      const img = document.createElement('img');
+                      img.src = gifPath;
+                      img.alt = "GIF";
+                      gifContainer.appendChild(img);
+                  }, index * 2000);
+              });
+          } else {
+              document.getElementById('gif-placeholder').textContent = 'لا توجد نتائج لعرضها';
+              document.getElementById('gif-placeholder').classList.remove('hidden');
+          }
+      });
+
+      socket.on('sign_language_translation', (data) => {
+          console.log('Received sign language translation:', data);
+          const { sentence, reshaped_sentence, sid } = data;
+          document.getElementById('translation-placeholder').classList.add('hidden');
+
+          const messageDiv = document.createElement('div');
+          messageDiv.classList.add('translation-message');
+          messageDiv.classList.add(sid === socket.id ? 'local' : 'remote');
+
+          let sentenceHtml = '';
+          sentence.forEach(item => {
+              sentenceHtml += `${item.word} `;
+          });
+          messageDiv.textContent = sentenceHtml.trim() || reshaped_sentence;
+
+          translationContainer.appendChild(messageDiv);
+          translationContainer.scrollTop = translationContainer.scrollHeight;
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              sendMessage();
+          }
+      });
+
+      function sendMessage() {
+          const message = chatInput.value.trim();
+          if (message) {
+              console.log('Sending message:', message);
+              socket.emit('chat_message', { message });
+              chatInput.value = '';
+          }
+      }
+
+      // Video frame sending for sign language detection
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 640;
+      canvas.height = 480;
+
+      function sendFrame() {
+          if (localVideo.readyState >= localVideo.HAVE_CURRENT_DATA) {
+              ctx.drawImage(localVideo, 0, 0, canvas.width, canvas.height);
+              const imageData = canvas.toDataURL('image/jpeg', 0.5);
+              socket.emit('video_frame', { frame: imageData });
+          }
+          setTimeout(sendFrame, 33); // ~30 FPS
+      }
+
+      localVideo.onloadeddata = () => {
+          console.log('Local video loaded, starting frame sending');
+          sendFrame();
+      };
+
+      socket.on('error', (data) => {
+          console.error('Socket error:', data);
+          statusElement.textContent = `خطأ: ${data.message}`;
+      });
+    </script>
+  </body>
+</html>

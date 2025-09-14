@@ -1,0 +1,55 @@
+Required ASL Video Files
+========================
+
+Place these video files in the static/asl_videos/ directory:
+
+ 1. asl_angry.mp4
+ 2. asl_bad.mp4
+ 3. asl_beautiful.mp4
+ 4. asl_big.mp4
+ 5. asl_cold.mp4
+ 6. asl_come.mp4
+ 7. asl_drink.mp4
+ 8. asl_eat.mp4
+ 9. asl_family.mp4
+10. asl_food.mp4
+11. asl_friend.mp4
+12. asl_go.mp4
+13. asl_good.mp4
+14. asl_goodbye.mp4
+15. asl_happy.mp4
+16. asl_hello.mp4
+17. asl_help.mp4
+18. asl_home.mp4
+19. asl_hot.mp4
+20. asl_like.mp4
+21. asl_love.mp4
+22. asl_money.mp4
+23. asl_morning.mp4
+24. asl_need.mp4
+25. asl_night.mp4
+26. asl_no.mp4
+27. asl_please.mp4
+28. asl_sad.mp4
+29. asl_small.mp4
+30. asl_sorry.mp4
+31. asl_stop.mp4
+32. asl_thank.mp4
+33. asl_time.mp4
+34. asl_ugly.mp4
+35. asl_wait.mp4
+36. asl_want.mp4
+37. asl_water.mp4
+38. asl_welcome.mp4
+39. asl_work.mp4
+40. asl_yes.mp4
+41. asl_you.mp4
+
+Total: 41 video files needed
+
+Video Requirements:
+- Format: MP4 (recommended)
+- Resolution: 640x480 or 1280x720 (recommended)
+- Duration: 2-5 seconds per word
+- Quality: Clear ASL demonstration
+- Background: Plain/neutral preferred

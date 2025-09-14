@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <title>اختبار تواصل - فيديو فقط</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        direction: rtl;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #202124;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+      }
+      .video-section {
+        flex: 3;
+        background-color: #ffffff;
+        padding: 10px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      #timer {
+        font-size: 16px;
+        font-weight: bold;
+        color: #000000;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #status {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      #video-feed {
+        width: 100%;
+        height: calc(100% - 90px);
+        background-color: #757575;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      #local-video,
+      #remote-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #video-placeholder {
+        max-width: 200px;
+        max-height: 200px;
+        color: white;
+      }
+      .video-overlay {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: 200px;
+        height: 150px;
+        background-color: #333;
+        border-radius: 4px;
+        overflow: hidden;
+        z-index: 10;
+      }
+      .controls {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .controls button {
+        padding: 8px 12px;
+        background-color: #ffffff;
+        color: #202124;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 100px;
+        justify-content: center;
+      }
+      .controls button:hover {
+        background-color: #e8f0fe;
+      }
+      .controls .red {
+        background-color: #c5221f;
+        color: white;
+      }
+      .controls .red:hover {
+        background-color: #a50e0b;
+      }
+      .controls .active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        border-color: #1a73e8;
+      }
+      .controls .blue {
+        background-color: #1a73e8;
+        color: white;
+      }
+      .controls .blue:hover {
+        background-color: #1557b0;
+      }
+      .chat-section {
+        flex: 1;
+        background-color: #ffffff;
+        padding: 10px;
+        border-left: 1px solid #dadce0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .chat-input-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      #chat-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        background-color: #f1f3f4;
+        margin-bottom: 0;
+        font-size: 14px;
+      }
+      #send-btn {
+        padding: 10px 20px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #send-btn:hover {
+        background-color: #1557b0;
+      }
+      .gif-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-height: 60%;
+      }
+      .gif-container img {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin: 5px 0;
+      }
+      .translation-section {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        margin-top: 10px;
+        max-height: 40%;
+        border: 1px solid #dadce0;
+        direction: rtl;
+        text-align: right;
+      }
+      .translation-message {
+        margin: 8px 0;
+        padding: 12px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        font-size: 14px;
+        direction: rtl;
+        text-align: right;
+        border-left: 3px solid #1a73e8;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .translation-message.own-message {
+        background-color: #e3f2fd;
+        border-left: 3px solid #2196f3;
+      }
+
+      .translation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .username {
+        font-weight: bold;
+        color: #1a73e8;
+      }
+
+      .timestamp {
+        font-size: 11px;
+        color: #999;
+      }
+
+      .translation-content {
+        font-size: 15px;
+        line-height: 1.4;
+        margin: 6px 0;
+      }
+
+      .confidence-info {
+        font-size: 11px;
+        color: #666;
+        margin-top: 4px;
+        font-style: italic;
+      }
+      .hidden {
+        display: none;
+      }
+      .info-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 100;
+      }
+      .test-notice {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(255, 165, 0, 0.9);
+        color: black;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 11px;
+        z-index: 100;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="video-section">
+        <div id="timer">
+          <span>00:00</span>
+          <span id="status">اختبار - في انتظار الاتصال</span>
+        </div>
+        <div id="video-feed">
+          <div id="video-placeholder">في انتظار الفيديو...</div>
+          <video id="remote-video" autoplay playsinline class="hidden"></video>
+          <div class="video-overlay">
+            <video
+              id="local-video"
+              autoplay
+              playsinline
+              muted
+              class="hidden"
+            ></video>
+          </div>
+          <div class="info-panel">
+            <div>المستخدم: {{ user.username if user else 'غير معروف' }}</div>
+            <div>UID: {{ user.uid if user else 'غير معروف' }}</div>
+            <div>الغرفة: {{ test_room }}</div>
+            <div>المبادر: {{ 'نعم' if is_initiator else 'لا' }}</div>
+          </div>
+          <div class="test-notice">
+            🔒 وضع الاختبار<br />
+            📹 فيديو + ترجمة لغة الإشارة + GIFs
+          </div>
+        </div>
+        <div class="controls">
+          <button id="mic-btn" class="blue" onclick="toggleMic()">
+            <span id="mic-icon">🎤</span>
+            <span id="mic-text">إغلاق الميكروفون</span>
+          </button>
+          <button id="camera-btn" class="blue" onclick="toggleCamera()">
+            <span id="camera-icon">📷</span>
+            <span id="camera-text">إغلاق الكاميرا</span>
+          </button>
+          <button id="end-call-btn" class="red" onclick="endCall()">
+            <span>📞</span> إنهاء المكالمة
+          </button>
+        </div>
+      </div>
+      <div class="chat-section">
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا..." />
+          <button id="send-btn">إرسال</button>
+        </div>
+        <div class="gif-container" id="gif-container">
+          <div id="gif-placeholder">سيتم عرض GIFs هنا عند إرسال رسالة</div>
+        </div>
+        <div class="translation-section" id="translation-container">
+          <div id="translation-placeholder">
+            💬 محادثة ترجمة لغة الإشارة
+            <br /><small>سيتم عرض الترجمات هنا مع أسماء المستخدمين</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      // Test configuration
+      const testRoom = "{{ test_room }}";
+      const currentUserUid = "{{ user.uid if user else '' }}";
+      const otherUserUid = "{{ other_user_uid }}";
+      const isInitiator = {{ 'true' if is_initiator else 'false' }};
+
+      console.log('🔒 TEST MODE: All features ENABLED');
+      console.log('📹 FOCUS: WebRTC video streaming + Sign language + GIFs');
+      console.log('Test Video Configuration:', {
+          testRoom,
+          currentUserUid,
+          otherUserUid,
+          isInitiator
+      });
+
+      // WebRTC configuration with TURN servers for remote connections
+      let peerConnection;
+      const iceServers = {
+          iceServers: [
+            {
+                urls: "stun:stun.relay.metered.ca:80",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:80",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+            {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+        ],
+          iceCandidatePoolSize: 10,
+          bundlePolicy: 'max-bundle',
+          rtcpMuxPolicy: 'require'
+      };
+
+      // Socket and video elements
+      const socket = io('/video');
+      let localVideo = document.getElementById('local-video');
+      let remoteVideo = document.getElementById('remote-video');
+      let statusElement = document.getElementById('status');
+      let timerElement = document.getElementById('timer');
+      let chatInput = document.getElementById('chat-input');
+      let sendBtn = document.getElementById('send-btn');
+      let gifContainer = document.getElementById('gif-container');
+
+      // State variables
+      let localStream = null;
+      let isMicMuted = false;
+      let isCameraOff = false;
+      let callTime = 0;
+      let timerInterval;
+      let remoteUserSid = null;
+      let pendingIceCandidates = []; // Queue for ICE candidates received before peer connection is ready
+
+      // Function to check permissions and browser compatibility
+      async function checkCameraPermissions() {
+          console.log('🔍 Checking camera permissions and browser compatibility...');
+          
+          // Check HTTPS
+          if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+              console.warn('⚠️ Not using HTTPS - camera may not work');
+              statusElement.textContent = '⚠️ قد تحتاج HTTPS للكاميرا';
+              
+              const httpsWarning = document.createElement('div');
+              httpsWarning.style.cssText = `
+                  position: fixed;
+                  top: 10px;
+                  right: 10px;
+                  background: #ff9800;
+                  color: white;
+                  padding: 10px;
+                  border-radius: 5px;
+                  font-size: 12px;
+                  z-index: 1000;
+                  max-width: 300px;
+                  direction: rtl;
+              `;
+              httpsWarning.innerHTML = `
+                  <strong>⚠️ تحذير أمان</strong><br>
+                  قد تحتاج لاستخدام HTTPS للوصول للكاميرا<br>
+                  <small>جرب: https://${location.host}${location.pathname}</small>
+              `;
+              document.body.appendChild(httpsWarning);
+              
+              setTimeout(() => httpsWarning.remove(), 10000);
+          }
+
+          // Check navigator.mediaDevices support
+          if (!navigator.mediaDevices) {
+              throw new Error('navigator.mediaDevices غير مدعوم في هذا المتصفح');
+          }
+
+          // Check getUserMedia support  
+          if (!navigator.mediaDevices.getUserMedia) {
+              throw new Error('getUserMedia غير مدعوم في هذا المتصفح');
+          }
+
+          // Enhanced device enumeration and testing
+          try {
+              console.log('📹 Enumerating media devices...');
+              statusElement.textContent = 'فحص الأجهزة المتاحة...';
+              
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              const videoDevices = devices.filter(device => device.kind === 'videoinput');
+              const audioDevices = devices.filter(device => device.kind === 'audioinput');
+              
+              console.log(`📹 Total devices found: ${devices.length}`);
+              console.log(`📹 Video devices: ${videoDevices.length}`);
+              console.log(`📹 Audio devices: ${audioDevices.length}`);
+              
+              // Log all devices for debugging
+              devices.forEach((device, index) => {
+                  console.log(`🎛️ Device ${index}:`, {
+                      kind: device.kind,
+                      label: device.label || 'Unknown',
+                      deviceId: device.deviceId ? 'present' : 'none',
+                      groupId: device.groupId ? 'present' : 'none'
+                  });
+              });
+
+              if (videoDevices.length === 0) {
+                  // Try to get more detailed device info by requesting permissions first
+                  console.log('⚠️ No video devices found, trying permission request...');
+                  statusElement.textContent = 'لم يتم العثور على كاميرا - محاولة طلب الأذونات...';
+                  
+                  try {
+                      // Sometimes devices only show up after permission is granted
+                      const testStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                      testStream.getTracks().forEach(track => track.stop()); // Stop immediately
+                      
+                      // Re-enumerate after permission granted
+                      const newDevices = await navigator.mediaDevices.enumerateDevices();
+                      const newVideoDevices = newDevices.filter(device => device.kind === 'videoinput');
+                      
+                      console.log(`📹 After permission request - Video devices: ${newVideoDevices.length}`);
+                      
+                      if (newVideoDevices.length === 0) {
+                          throw new Error('لا توجد كاميرا متاحة على هذا الجهاز');
+                      }
+                  } catch (permError) {
+                      console.error('❌ Permission test failed:', permError);
+                      throw new Error('لم يتم العثور على كاميرا متاحة - تحقق من توصيل الكاميرا وأذونات المتصفح');
+                  }
+              }
+
+              // Test specific video devices if available
+              if (videoDevices.length > 0) {
+                  console.log('🧪 Testing video devices...');
+                  statusElement.textContent = 'اختبار الكاميرات المتاحة...';
+                  
+                  for (let i = 0; i < Math.min(videoDevices.length, 3); i++) {
+                      try {
+                          const device = videoDevices[i];
+                          console.log(`🧪 Testing device ${i}: ${device.label || 'Unknown'}`);
+                          
+                          const testConstraints = {
+                              video: { deviceId: device.deviceId ? { exact: device.deviceId } : undefined },
+                              audio: false
+                          };
+                          
+                          const testStream = await navigator.mediaDevices.getUserMedia(testConstraints);
+                          const videoTrack = testStream.getVideoTracks()[0];
+                          
+                          console.log(`✅ Device ${i} works:`, {
+                              label: videoTrack.label,
+                              settings: videoTrack.getSettings(),
+                              capabilities: videoTrack.getCapabilities ? videoTrack.getCapabilities() : 'N/A'
+                          });
+                          
+                          testStream.getTracks().forEach(track => track.stop());
+                          break; // Found working camera
+                      } catch (deviceError) {
+                          console.warn(`⚠️ Device ${i} failed:`, deviceError.message);
+                          if (i === videoDevices.length - 1) {
+                              throw new Error('جميع كاميرات الجهاز غير متاحة أو معطلة');
+                          }
+                      }
+                  }
+              }
+
+          } catch (error) {
+              console.error('❌ Device enumeration failed:', error);
+              throw error;
+          }
+
+          // Check permissions if available
+          if (navigator.permissions && navigator.permissions.query) {
+              try {
+                  const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+                  const microphonePermission = await navigator.permissions.query({ name: 'microphone' });
+                  
+                  console.log('📹 Camera permission:', cameraPermission.state);
+                  console.log('🎤 Microphone permission:', microphonePermission.state);
+                  
+                  if (cameraPermission.state === 'denied') {
+                      throw new Error('تم رفض إذن الكاميرا من قبل - يجب إعادة تعيينه في إعدادات المتصفح');
+                  }
+                  
+                  if (microphonePermission.state === 'denied') {
+                      console.warn('⚠️ Microphone permission denied - audio may not work');
+                  }
+                  
+              } catch (permError) {
+                  console.warn('⚠️ Could not check permissions:', permError);
+                  // Continue anyway as this API is not supported everywhere
+              }
+          }
+
+          console.log('✅ Permission checks completed');
+          return true;
+      }
+
+      // Manual camera test function
+      async function testCameraManually() {
+          console.log('🧪 Manual camera test started...');
+          
+          const testResults = {
+              devices: [],
+              workingDevices: [],
+              errors: []
+          };
+
+          try {
+              // Get all devices
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              testResults.devices = devices.filter(d => d.kind === 'videoinput');
+              
+              console.log(`🧪 Found ${testResults.devices.length} video input devices`);
+              
+              if (testResults.devices.length === 0) {
+                  testResults.errors.push('لا توجد كاميرات متاحة في النظام');
+                  return testResults;
+              }
+
+              // Test each device
+              for (let i = 0; i < testResults.devices.length; i++) {
+                  const device = testResults.devices[i];
+                  console.log(`🧪 Testing device ${i}: ${device.label || 'Unknown'}`);
+                  
+                  try {
+                      const constraints = {
+                          video: { 
+                              deviceId: device.deviceId ? { exact: device.deviceId } : undefined,
+                              width: { ideal: 640 },
+                              height: { ideal: 480 }
+                          },
+                          audio: false
+                      };
+                      
+                      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                      const videoTrack = stream.getVideoTracks()[0];
+                      
+                      testResults.workingDevices.push({
+                          device: device,
+                          track: videoTrack,
+                          settings: videoTrack.getSettings(),
+                          capabilities: videoTrack.getCapabilities ? videoTrack.getCapabilities() : null
+                      });
+                      
+                      console.log(`✅ Device ${i} is working`);
+                      
+                      // Stop the test stream
+                      stream.getTracks().forEach(track => track.stop());
+                      
+                  } catch (deviceError) {
+                      console.error(`❌ Device ${i} failed:`, deviceError);
+                      testResults.errors.push(`الجهاز ${i} (${device.label || 'Unknown'}): ${deviceError.message}`);
+                  }
+              }
+              
+          } catch (enumError) {
+              console.error('❌ Failed to enumerate devices:', enumError);
+              testResults.errors.push(`فشل في قراءة الأجهزة: ${enumError.message}`);
+          }
+
+          return testResults;
+      }
+
+      // Show enhanced camera troubleshooting dialog
+      function showCameraTroubleshootingDialog(error) {
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = `
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: #fff;
+              border: 2px solid #e74c3c;
+              border-radius: 10px;
+              padding: 20px;
+              max-width: 600px;
+              max-height: 80vh;
+              overflow-y: auto;
+              text-align: center;
+              direction: rtl;
+              font-family: Arial, sans-serif;
+              z-index: 1000;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          `;
+
+          let errorMessage = 'مشكلة في الوصول للكاميرا';
+          let userGuidance = '';
+          let additionalTests = '';
+
+          if (error.name === 'NotFoundError' || error.message.includes('لم يتم العثور') || error.message.includes('لا توجد')) {
+              errorMessage = 'لم يتم العثور على كاميرا';
+              userGuidance = `
+إرشادات مفصلة لحل المشكلة:
+
+🔍 فحص الأجهزة:
+• تأكد من توصيل كاميرا ويب USB (إذا كنت تستخدم كمبيوتر مكتبي)
+• للابتوب: تأكد من أن الكاميرا المدمجة مفعلة
+• تحقق من وجود مفتاح أو زر لتشغيل/إيقاف الكاميرا على الكيبورد
+
+🖥️ إعدادات النظام:
+• Windows: اذهب إلى الإعدادات > الخصوصية > الكاميرا
+• تأكد من السماح للتطبيقات بالوصول للكاميرا
+• تأكد من السماح لتطبيقات سطح المكتب بالوصول للكاميرا
+
+🌐 إعدادات المتصفح:
+• انقر على أيقونة القفل في شريط العناوين
+• تأكد من السماح للكاميرا والميكروفون
+• جرب إعادة تعيين أذونات الموقع
+
+🔧 إدارة الأجهزة (Windows):
+• انقر بزر الماوس الأيمن على "This PC" > خصائص > إدارة الأجهزة
+• ابحث عن "Cameras" أو "Imaging devices"
+• تأكد من عدم وجود علامة تحذير أو خطأ
+• جرب إلغاء التثبيت وإعادة التثبيت
+              `;
+              
+              additionalTests = `
+                  <div style="margin: 20px 0; padding: 15px; background: #f0f8ff; border-radius: 5px;">
+                      <button onclick="runCameraTest()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">🧪 اختبار الكاميرات يدوياً</button>
+                      <button onclick="openSystemCameraTest()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">📹 فتح تطبيق الكاميرا</button>
+                      <div id="camera-test-results" style="margin-top: 10px; font-size: 12px; text-align: right;"></div>
+                  </div>
+              `;
+          }
+
+          errorDiv.innerHTML = `
+              <h3 style="color: #e74c3c; margin: 0 0 15px 0;">❌ ${errorMessage}</h3>
+              <div style="text-align: right; background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                  <pre style="white-space: pre-line; margin: 0; font-size: 13px; color: #666; line-height: 1.5;">${userGuidance}</pre>
+              </div>
+              ${additionalTests}
+              <div style="margin-top: 20px;">
+                  <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">🔄 إعادة المحاولة</button>
+                  <button onclick="tryWithoutCamera()" style="background: #9b59b6; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">📱 متابعة بدون كاميرا</button>
+                  <button onclick="this.parentElement.parentElement.remove()" style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">✖️ إغلاق</button>
+              </div>
+              <div style="margin-top: 15px; font-size: 12px; color: #666;">
+                  <p><strong>تفاصيل تقنية:</strong> ${error.name} - ${error.message}</p>
+                  <p><strong>المتصفح:</strong> ${navigator.userAgent}</p>
+                  <p><strong>الموقع:</strong> ${window.location.protocol}//${window.location.host}</p>
+              </div>
+          `;
+
+          // Add functions to window for button clicks
+          window.runCameraTest = async function() {
+              const button = errorDiv.querySelector('button[onclick="runCameraTest()"]');
+              const resultsDiv = document.getElementById('camera-test-results');
+              
+              button.textContent = '🔄 جاري الاختبار...';
+              button.disabled = true;
+              
+              try {
+                  const results = await testCameraManually();
+                  
+                  let resultText = `📊 نتائج الاختبار:\n`;
+                  resultText += `• الأجهزة الموجودة: ${results.devices.length}\n`;
+                  resultText += `• الأجهزة العاملة: ${results.workingDevices.length}\n`;
+                  
+                  if (results.workingDevices.length > 0) {
+                      resultText += `\n✅ كاميرات تعمل:\n`;
+                      results.workingDevices.forEach((device, i) => {
+                          resultText += `  ${i+1}. ${device.device.label || 'Unknown'}\n`;
+                      });
+                  }
+                  
+                  if (results.errors.length > 0) {
+                      resultText += `\n❌ أخطاء:\n`;
+                      results.errors.forEach(error => {
+                          resultText += `  • ${error}\n`;
+                      });
+                  }
+                  
+                  resultsDiv.innerHTML = `<pre style="text-align: right; font-size: 11px; background: #f9f9f9; padding: 10px; border-radius: 3px; margin-top: 10px;">${resultText}</pre>`;
+              } catch (testError) {
+                  resultsDiv.innerHTML = `<div style="color: #e74c3c; font-size: 12px; margin-top: 10px;">❌ فشل الاختبار: ${testError.message}</div>`;
+              }
+              
+              button.textContent = '🧪 اختبار الكاميرات يدوياً';
+              button.disabled = false;
+          };
+
+          window.openSystemCameraTest = function() {
+              // Try to open system camera app
+              if (navigator.userAgent.includes('Windows')) {
+                  window.open('ms-windows-store://pdp/?productid=9wzdncrfjbbg', '_blank');
+              } else {
+                  alert('جرب فتح تطبيق الكاميرا المدمج في نظام التشغيل للتأكد من عملها');
+              }
+          };
+
+          window.tryWithoutCamera = function() {
+              alert('سيتم تشغيل التطبيق في وضع الصوت فقط (بدون فيديو)');
+              errorDiv.remove();
+              // Initialize without video
+              initAudioOnlyMode();
+          };
+
+          document.body.appendChild(errorDiv);
+      }
+
+      // Initialize
+      socket.on('connect', () => {
+          console.log('Connected to /video namespace');
+          statusElement.textContent = 'متصل - فحص الأذونات...';
+
+          checkCameraPermissions()
+              .then(() => {
+                  console.log('✅ Permission checks passed, initializing video...');
+                  statusElement.textContent = 'فحص الأذونات مكتمل - إعداد الكاميرا...';
+                  return initVideoCall();
+              })
+              .then(() => {
+                  console.log('✅ Video initialization completed, joining room...');
+              statusElement.textContent = 'جاهز - انضمام للغرفة';
+              joinTestRoom();
+              })
+              .catch(error => {
+                  console.error('❌ Initialization failed:', error);
+                  console.error('❌ Error stack:', error.stack);
+                  console.error('❌ Error name:', error.name);
+                  console.error('❌ Error message:', error.message);
+                  
+                  // More specific error handling
+                  let errorContext = 'فشل في الإعداد الأولي';
+                  if (error.message && error.message.includes('لم يتم العثور')) {
+                      errorContext = 'فشل في العثور على الكاميرا';
+                  } else if (error.message && error.message.includes('getUserMedia')) {
+                      errorContext = 'فشل في الوصول للكاميرا';
+                  } else if (error.name === 'NotAllowedError') {
+                      errorContext = 'تم رفض الأذونات';
+                  } else if (error.name === 'NotFoundError') {
+                      errorContext = 'لم يتم العثور على كاميرا';
+                  } else if (error.name === 'NotReadableError') {
+                      errorContext = 'الكاميرا قيد الاستخدام';
+                  }
+                  
+                  statusElement.textContent = errorContext + ' - راجع وحدة التحكم للتفاصيل';
+                  
+                  // Show detailed error in a more user-friendly way
+                  showDetailedErrorDialog(error, errorContext);
+          });
+      });
+
+      // Detailed error dialog with console output
+      function showDetailedErrorDialog(error, context) {
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = `
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: #fff;
+              border: 2px solid #e74c3c;
+              border-radius: 10px;
+              padding: 20px;
+              max-width: 700px;
+              max-height: 80vh;
+              overflow-y: auto;
+              text-align: center;
+              direction: rtl;
+              font-family: Arial, sans-serif;
+              z-index: 1000;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          `;
+
+          errorDiv.innerHTML = `
+              <h3 style="color: #e74c3c; margin: 0 0 15px 0;">❌ ${context}</h3>
+              <div style="text-align: right; background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                  <h4>معلومات الخطأ:</h4>
+                  <p><strong>نوع الخطأ:</strong> ${error.name || 'غير محدد'}</p>
+                  <p><strong>رسالة الخطأ:</strong> ${error.message || 'غير محدد'}</p>
+                  <p><strong>السياق:</strong> ${context}</p>
+              </div>
+              
+              <div style="margin: 20px 0; padding: 15px; background: #e8f4fd; border-radius: 5px;">
+                  <h4>🛠️ خطوات التشخيص:</h4>
+                  <button onclick="runFullDiagnostics()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer; width: 100%;">🔍 تشغيل تشخيص شامل</button>
+                  <button onclick="testPermissionsAgain()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer; width: 100%;">🔑 اختبار الأذونات مرة أخرى</button>
+                  <button onclick="tryDifferentSettings()" style="background: #ffc107; color: black; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer; width: 100%;">⚙️ جرب إعدادات مختلفة</button>
+                  <div id="diagnostic-results" style="margin-top: 15px; font-size: 12px; text-align: right; background: #f9f9f9; padding: 10px; border-radius: 5px; min-height: 100px; white-space: pre-wrap;"></div>
+              </div>
+              
+              <div style="margin-top: 20px;">
+                  <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">🔄 إعادة المحاولة</button>
+                  <button onclick="tryAudioOnlyFromDialog()" style="background: #9b59b6; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">🎤 صوت فقط</button>
+                  <button onclick="this.parentElement.parentElement.remove()" style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">✖️ إغلاق</button>
+              </div>
+          `;
+
+          // Enhanced diagnostic functions
+          window.runFullDiagnostics = async function() {
+              const resultsDiv = document.getElementById('diagnostic-results');
+              resultsDiv.textContent = 'جاري تشغيل التشخيص الشامل...\n';
+              
+              try {
+                  // 1. Check browser support
+                  resultsDiv.textContent += '\n🌐 فحص دعم المتصفح:\n';
+                  resultsDiv.textContent += `• المتصفح: ${navigator.userAgent.includes('Chrome') ? 'Chrome' : navigator.userAgent.includes('Firefox') ? 'Firefox' : navigator.userAgent.includes('Safari') ? 'Safari' : 'غير محدد'}\n`;
+                  resultsDiv.textContent += `• navigator.mediaDevices: ${navigator.mediaDevices ? '✅ متاح' : '❌ غير متاح'}\n`;
+                  resultsDiv.textContent += `• getUserMedia: ${navigator.mediaDevices?.getUserMedia ? '✅ متاح' : '❌ غير متاح'}\n`;
+                  resultsDiv.textContent += `• الموقع: ${location.protocol}//${location.host}\n`;
+                  resultsDiv.textContent += `• HTTPS: ${location.protocol === 'https:' ? '✅ نعم' : '❌ لا'}\n`;
+
+                  // 2. Check permissions
+                  resultsDiv.textContent += '\n🔑 فحص الأذونات:\n';
+                  if (navigator.permissions) {
+                      try {
+                          const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+                          const micPermission = await navigator.permissions.query({ name: 'microphone' });
+                          resultsDiv.textContent += `• الكاميرا: ${cameraPermission.state}\n`;
+                          resultsDiv.textContent += `• الميكروفون: ${micPermission.state}\n`;
+                      } catch (e) {
+                          resultsDiv.textContent += `• خطأ في فحص الأذونات: ${e.message}\n`;
+                      }
+                  } else {
+                      resultsDiv.textContent += '• API الأذونات غير متاح\n';
+                  }
+
+                  // 3. Enumerate devices
+                  resultsDiv.textContent += '\n📹 فحص الأجهزة:\n';
+                  const devices = await navigator.mediaDevices.enumerateDevices();
+                  const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                  const audioDevices = devices.filter(d => d.kind === 'audioinput');
+                  
+                  resultsDiv.textContent += `• إجمالي الأجهزة: ${devices.length}\n`;
+                  resultsDiv.textContent += `• أجهزة الفيديو: ${videoDevices.length}\n`;
+                  resultsDiv.textContent += `• أجهزة الصوت: ${audioDevices.length}\n`;
+                  
+                  videoDevices.forEach((device, i) => {
+                      resultsDiv.textContent += `  ${i+1}. ${device.label || 'جهاز غير معروف'} (${device.deviceId ? 'ID موجود' : 'لا يوجد ID'})\n`;
+                  });
+
+                  // 4. Test actual camera access
+                  resultsDiv.textContent += '\n🧪 اختبار الوصول للكاميرا:\n';
+                  
+                  try {
+                      const testStream = await navigator.mediaDevices.getUserMedia({ 
+                          video: { width: 640, height: 480 }, 
+                  audio: true
+              });
+                      
+                      const videoTracks = testStream.getVideoTracks();
+                      const audioTracks = testStream.getAudioTracks();
+                      
+                      resultsDiv.textContent += `✅ نجح الوصول للكاميرا!\n`;
+                      resultsDiv.textContent += `• مسارات الفيديو: ${videoTracks.length}\n`;
+                      resultsDiv.textContent += `• مسارات الصوت: ${audioTracks.length}\n`;
+                      
+                      if (videoTracks.length > 0) {
+                          const track = videoTracks[0];
+                          resultsDiv.textContent += `• إعدادات الفيديو: ${JSON.stringify(track.getSettings(), null, 2)}\n`;
+                      }
+                      
+                      // Stop the test stream
+                      testStream.getTracks().forEach(track => track.stop());
+                      
+                      resultsDiv.textContent += '\n🎉 التشخيص مكتمل - الكاميرا تعمل! جرب إعادة تحميل الصفحة.\n';
+                      
+                  } catch (testError) {
+                      resultsDiv.textContent += `❌ فشل الوصول للكاميرا: ${testError.name} - ${testError.message}\n`;
+                      
+                      // Try audio only
+                      try {
+                          const audioStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+                          resultsDiv.textContent += `✅ الصوت يعمل - يمكن استخدام وضع الصوت فقط\n`;
+                          audioStream.getTracks().forEach(track => track.stop());
+                      } catch (audioError) {
+                          resultsDiv.textContent += `❌ الصوت أيضاً لا يعمل: ${audioError.message}\n`;
+                      }
+                  }
+
+              } catch (diagError) {
+                  resultsDiv.textContent += `\n❌ خطأ في التشخيص: ${diagError.message}\n`;
+              }
+          };
+
+          window.testPermissionsAgain = async function() {
+              const resultsDiv = document.getElementById('diagnostic-results');
+              resultsDiv.textContent = 'اختبار الأذونات مرة أخرى...\n';
+              
+              try {
+                  const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                  resultsDiv.textContent += '✅ تم منح الأذونات بنجاح!\n';
+                  resultsDiv.textContent += 'يمكنك الآن إعادة تحميل الصفحة.\n';
+                  stream.getTracks().forEach(track => track.stop());
+              } catch (error) {
+                  resultsDiv.textContent += `❌ فشل في الأذونات: ${error.name} - ${error.message}\n`;
+              }
+          };
+
+          window.tryDifferentSettings = async function() {
+              const resultsDiv = document.getElementById('diagnostic-results');
+              resultsDiv.textContent = 'جاري تجربة إعدادات مختلفة...\n';
+              
+              const settingsToTry = [
+                  { video: true, audio: true },
+                  { video: { width: 640, height: 480 }, audio: true },
+                  { video: { width: 320, height: 240 }, audio: true },
+                  { video: { facingMode: 'user' }, audio: true },
+                  { video: { facingMode: 'environment' }, audio: true }
+              ];
+
+              for (let i = 0; i < settingsToTry.length; i++) {
+                  try {
+                      resultsDiv.textContent += `\nمحاولة ${i+1}: ${JSON.stringify(settingsToTry[i])}\n`;
+                      const stream = await navigator.mediaDevices.getUserMedia(settingsToTry[i]);
+                      resultsDiv.textContent += `✅ نجحت المحاولة ${i+1}!\n`;
+                      stream.getTracks().forEach(track => track.stop());
+                      break;
+                  } catch (error) {
+                      resultsDiv.textContent += `❌ فشلت المحاولة ${i+1}: ${error.message}\n`;
+                  }
+              }
+          };
+
+          window.tryAudioOnlyFromDialog = function() {
+              errorDiv.remove();
+              initAudioOnlyMode();
+          };
+
+          document.body.appendChild(errorDiv);
+      }
+
+      async function initVideoCall() {
+          try {
+              // Check if getUserMedia is available
+              if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                  throw new Error('getUserMedia is not supported in this browser');
+              }
+
+              console.log('🎥 Requesting camera and microphone access...');
+              statusElement.textContent = 'طلب إذن الوصول للكاميرا والميكروفون...';
+
+              // Request permissions with specific constraints
+              const constraints = {
+                  video: {
+                      width: { ideal: 1280, max: 1920 },
+                      height: { ideal: 720, max: 1080 },
+                      frameRate: { ideal: 30, max: 60 }
+                  },
+                  audio: {
+                      echoCancellation: true,
+                      noiseSuppression: true,
+                      autoGainControl: true
+                  }
+              };
+
+              localStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+              // Check if we got both video and audio tracks
+              const videoTracks = localStream.getVideoTracks();
+              const audioTracks = localStream.getAudioTracks();
+
+              console.log(`✅ Media access granted - Video: ${videoTracks.length}, Audio: ${audioTracks.length}`);
+
+              if (videoTracks.length === 0) {
+                  throw new Error('No video track available');
+              }
+
+              localVideo.srcObject = localStream;
+              localVideo.classList.remove('hidden');
+              document.querySelector('.video-overlay').classList.remove('hidden');
+              document.getElementById('video-placeholder').style.display = 'none';
+
+              // Log stream info
+              videoTracks.forEach((track, index) => {
+                  console.log(`📹 Video track ${index}:`, {
+                      label: track.label,
+                      kind: track.kind,
+                      enabled: track.enabled,
+                      readyState: track.readyState,
+                      settings: track.getSettings()
+                  });
+              });
+
+              audioTracks.forEach((track, index) => {
+                  console.log(`🎤 Audio track ${index}:`, {
+                      label: track.label,
+                      kind: track.kind,
+                      enabled: track.enabled,
+                      readyState: track.readyState,
+                      settings: track.getSettings()
+                  });
+              });
+
+              console.log('✅ Local video initialized successfully');
+              statusElement.textContent = 'تم إعداد الكاميرا بنجاح';
+              return Promise.resolve();
+          } catch (error) {
+              console.error('❌ Error accessing media devices:', error);
+              
+              let errorMessage = 'حدث خطأ في الوصول للكاميرا: ';
+              let userGuidance = '';
+
+              // Provide specific error messages and guidance
+              if (error.name === 'NotAllowedError') {
+                  errorMessage = 'تم رفض إذن الوصول للكاميرا';
+                  userGuidance = `
+إرشادات حل المشكلة:
+1. انقر على أيقونة القفل أو الكاميرا في شريط العناوين
+2. اختر "السماح" للكاميرا والميكروفون
+3. أعد تحميل الصفحة
+4. إذا كنت تستخدم HTTPS، تأكد من أن الاتصال آمن
+                  `;
+              } else if (error.name === 'NotFoundError') {
+                  errorMessage = 'لم يتم العثور على كاميرا';
+                  userGuidance = `
+إرشادات حل المشكلة:
+1. تأكد من توصيل الكاميرا بالجهاز
+2. تحقق من أن الكاميرا تعمل في تطبيقات أخرى
+3. أعد تشغيل المتصفح
+                  `;
+              } else if (error.name === 'NotSupportedError') {
+                  errorMessage = 'متصفحك لا يدعم الوصول للكاميرا';
+                  userGuidance = `
+إرشادات حل المشكلة:
+1. استخدم متصفح حديث (Chrome, Firefox, Safari, Edge)
+2. تأكد من تحديث المتصفح لآخر إصدار
+3. استخدم HTTPS بدلاً من HTTP
+                  `;
+              } else if (error.name === 'NotReadableError') {
+                  errorMessage = 'الكاميرا مستخدمة من تطبيق آخر';
+                  userGuidance = `
+إرشادات حل المشكلة:
+1. أغلق التطبيقات الأخرى التي تستخدم الكاميرا
+2. أعد تشغيل المتصفح
+3. أعد تشغيل الجهاز إذا لزم الأمر
+                  `;
+              } else if (error.name === 'OverconstrainedError') {
+                  errorMessage = 'إعدادات الكاميرا المطلوبة غير متاحة';
+                  userGuidance = `
+محاولة إعدادات أبسط...
+                  `;
+                  
+                  // Try with simpler constraints
+                  try {
+                      console.log('🔄 Trying with basic constraints...');
+                      const basicConstraints = { video: true, audio: true };
+                      localStream = await navigator.mediaDevices.getUserMedia(basicConstraints);
+                      
+                      localVideo.srcObject = localStream;
+                      localVideo.classList.remove('hidden');
+                      document.querySelector('.video-overlay').classList.remove('hidden');
+                      document.getElementById('video-placeholder').style.display = 'none';
+                      
+                      console.log('✅ Basic constraints worked');
+                      statusElement.textContent = 'تم إعداد الكاميرا بإعدادات أساسية';
+                      return Promise.resolve();
+                  } catch (retryError) {
+                      console.error('❌ Basic constraints also failed:', retryError);
+                      errorMessage = 'فشل في إعداد الكاميرا حتى بإعدادات أساسية';
+                  }
+              } else {
+                  errorMessage += error.message || 'خطأ غير معروف';
+                  userGuidance = `
+إرشادات عامة:
+1. تأكد من أن المتصفح محدث
+2. امنح الأذونات المطلوبة للموقع
+3. جرب متصفح آخر
+4. تأكد من عمل الكاميرا في تطبيقات أخرى
+                  `;
+              }
+
+              // Use enhanced troubleshooting dialog
+              showCameraTroubleshootingDialog(error);
+              statusElement.textContent = 'فشل في إعداد الكاميرا - راجع نافذة الإرشادات';
+              return Promise.reject(error);
+          }
+      }
+
+      // Audio-only mode for when camera is not available
+      async function initAudioOnlyMode() {
+          try {
+              console.log('🎤 Initializing audio-only mode...');
+              statusElement.textContent = 'إعداد الصوت فقط (بدون فيديو)...';
+
+              localStream = await navigator.mediaDevices.getUserMedia({
+                  video: false,
+                  audio: {
+                      echoCancellation: true,
+                      noiseSuppression: true,
+                      autoGainControl: true
+                  }
+              });
+
+              // Show audio-only indicator
+              const audioOnlyDiv = document.createElement('div');
+              audioOnlyDiv.style.cssText = `
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  background: rgba(0, 0, 0, 0.8);
+                  color: white;
+                  padding: 20px;
+                  border-radius: 10px;
+                  text-align: center;
+                  z-index: 5;
+              `;
+              audioOnlyDiv.innerHTML = `
+                  <h3>🎤 وضع الصوت فقط</h3>
+                  <p>سيعمل التطبيق بالصوت فقط بدون فيديو</p>
+                  <p>يمكنك استخدام الدردشة وترجمة النصوص</p>
+              `;
+              
+              document.getElementById('video-feed').appendChild(audioOnlyDiv);
+
+              // Hide camera controls
+              document.getElementById('camera-btn').style.display = 'none';
+
+              console.log('✅ Audio-only mode initialized');
+              statusElement.textContent = 'جاهز - وضع الصوت فقط';
+              
+              joinTestRoom();
+              return Promise.resolve();
+          } catch (audioError) {
+              console.error('❌ Audio-only mode failed:', audioError);
+              statusElement.textContent = 'فشل حتى في إعداد الصوت';
+              
+              // Last resort - text only mode
+              initTextOnlyMode();
+              return Promise.reject(audioError);
+          }
+      }
+
+      // Text-only mode as last resort
+      function initTextOnlyMode() {
+          console.log('💬 Initializing text-only mode...');
+          statusElement.textContent = 'وضع النص فقط';
+
+          const textOnlyDiv = document.createElement('div');
+          textOnlyDiv.style.cssText = `
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: rgba(52, 152, 219, 0.9);
+              color: white;
+              padding: 20px;
+              border-radius: 10px;
+              text-align: center;
+              z-index: 5;
+          `;
+          textOnlyDiv.innerHTML = `
+              <h3>💬 وضع النص فقط</h3>
+              <p>يمكنك استخدام الدردشة وترجمة النصوص إلى لغة الإشارة</p>
+              <p>الفيديو والصوت غير متاحين</p>
+          `;
+          
+          document.getElementById('video-feed').appendChild(textOnlyDiv);
+
+          // Hide video/audio controls
+          document.getElementById('camera-btn').style.display = 'none';
+          document.getElementById('mic-btn').style.display = 'none';
+
+          joinTestRoom();
+      }
+
+      function joinTestRoom() {
+          socket.emit('join_test_room', {
+              user_uid: currentUserUid,
+              test_room: testRoom
+          });
+      }
+
+      socket.on('test_room_ready', (data) => {
+          console.log('Test room ready:', data);
+          statusElement.textContent = 'الغرفة جاهزة - ' + data.all_participants.length + ' مشاركين';
+
+          if (data.can_initiate && isInitiator) {
+              statusElement.textContent = 'بدء الاتصال...';
+              setTimeout(() => {
+                  startCall();
+              }, 1000);
+          } else {
+              statusElement.textContent = 'في انتظار الاتصال...';
+          }
+      });
+
+      socket.on('waiting_for_other_user', (data) => {
+          console.log('Waiting for other user:', data);
+          statusElement.textContent = 'في انتظار المستخدم الآخر...';
+      });
+
+      socket.on('user_joined_test_room', (data) => {
+          console.log('User joined test room:', data);
+          statusElement.textContent = `مستخدم انضم - ${data.participants_count} مشاركين`;
+      });
+
+      socket.on('user_left_test_room', (data) => {
+          console.log('User left test room:', data);
+          statusElement.textContent = `مستخدم غادر - ${data.participants_count} مشاركين`;
+      });
+
+      function createPeerConnection() {
+          console.log('🔧 Creating peer connection...');
+          peerConnection = new RTCPeerConnection(iceServers);
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => {
+                  console.log('➕ Adding local track:', track.kind);
+                  peerConnection.addTrack(track, localStream);
+              });
+          }
+
+          peerConnection.onicecandidate = (event) => {
+              if (event.candidate) {
+                  console.log('🧊 Sending ICE candidate:', {
+                      type: event.candidate.type,
+                      protocol: event.candidate.protocol,
+                      address: event.candidate.address,
+                      port: event.candidate.port
+                  });
+                  // No target_sid needed in test mode - broadcast to room
+                  socket.emit('ice_candidate', {
+                      candidate: event.candidate
+                  });
+              } else {
+                  console.log('🧊 All ICE candidates sent (null candidate)');
+              }
+          };
+
+          peerConnection.ontrack = (event) => {
+              console.log('✅ Received remote stream:', event.streams[0]);
+              console.log('📊 Remote stream tracks:', event.streams[0].getTracks().map(t => t.kind));
+              remoteVideo.srcObject = event.streams[0];
+              remoteVideo.classList.remove('hidden');
+              statusElement.textContent = '✅ متصل بنجاح';
+              startTimer();
+          };
+
+          peerConnection.onconnectionstatechange = () => {
+              console.log('🔗 Connection state:', peerConnection.connectionState);
+              if (peerConnection.connectionState === 'connected') {
+                  statusElement.textContent = '✅ متصل بنجاح';
+              } else if (peerConnection.connectionState === 'disconnected') {
+                  statusElement.textContent = '❌ انقطع الاتصال';
+              } else if (peerConnection.connectionState === 'failed') {
+                  statusElement.textContent = '❌ فشل الاتصال';
+                  console.error('❌ Connection failed - trying to restart ICE');
+                  peerConnection.restartIce();
+              } else if (peerConnection.connectionState === 'connecting') {
+                  statusElement.textContent = '🔄 جاري الاتصال...';
+              }
+          };
+
+          peerConnection.oniceconnectionstatechange = () => {
+              console.log('❄️ ICE connection state:', peerConnection.iceConnectionState);
+              if (peerConnection.iceConnectionState === 'failed') {
+                  console.error('❄️ ICE connection failed - this often happens with remote connections');
+                  statusElement.textContent = '❌ فشل اتصال ICE - تحقق من خوادم TURN';
+              } else if (peerConnection.iceConnectionState === 'disconnected') {
+                  statusElement.textContent = '🔄 انقطع اتصال ICE';
+              } else if (peerConnection.iceConnectionState === 'connected') {
+                  statusElement.textContent = '✅ اتصال ICE ناجح';
+              } else if (peerConnection.iceConnectionState === 'checking') {
+                  statusElement.textContent = '🔍 فحص اتصال ICE...';
+              }
+          };
+
+          peerConnection.onicegatheringstatechange = () => {
+              console.log('🌐 ICE gathering state:', peerConnection.iceGatheringState);
+          };
+      }
+
+      async function startCall() {
+          console.log('🚀 Starting call as initiator');
+          createPeerConnection();
+
+          try {
+              const offer = await peerConnection.createOffer({
+                  offerToReceiveAudio: true,
+                  offerToReceiveVideo: true,
+                  iceRestart: false
+              });
+              await peerConnection.setLocalDescription(offer);
+
+              console.log('📤 Sending offer...', {
+                  type: offer.type,
+                  sdpSize: offer.sdp.length
+              });
+              // No target_sid needed in test mode - broadcast to room
+              socket.emit('offer', {
+                  offer: offer
+              });
+
+              statusElement.textContent = '📤 تم إرسال العرض';
+          } catch (error) {
+              console.error('❌ Error creating offer:', error);
+              statusElement.textContent = '❌ خطأ في إنشاء العرض';
+          }
+      }
+
+      async function processPendingIceCandidates() {
+          while (pendingIceCandidates.length > 0 && peerConnection && peerConnection.remoteDescription) {
+              const candidate = pendingIceCandidates.shift();
+              try {
+                  await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                  console.log('✅ Added queued ICE candidate');
+              } catch (error) {
+                  console.error('❌ Error adding queued ICE candidate:', error);
+              }
+          }
+      }
+
+      socket.on('offer', async (data) => {
+          console.log('📥 Received offer from:', data.sid, {
+              type: data.offer.type,
+              sdpSize: data.offer.sdp.length
+          });
+          if (data.sid !== socket.id) {
+              remoteUserSid = data.sid;
+              createPeerConnection();
+
+              try {
+                  await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                  await processPendingIceCandidates(); // Process queued candidates
+
+                  const answer = await peerConnection.createAnswer({
+                      offerToReceiveAudio: true,
+                      offerToReceiveVideo: true
+                  });
+                  await peerConnection.setLocalDescription(answer);
+
+                  console.log('📤 Sending answer...', {
+                      type: answer.type,
+                      sdpSize: answer.sdp.length
+                  });
+                  socket.emit('answer', {
+                      answer: answer
+                  });
+
+                  statusElement.textContent = '📤 تم إرسال الإجابة';
+              } catch (error) {
+                  console.error('❌ Error handling offer:', error);
+                  statusElement.textContent = '❌ خطأ في معالجة العرض';
+              }
+          } else {
+              console.log('🔄 Ignoring offer from self');
+          }
+      });
+
+      socket.on('answer', async (data) => {
+          console.log('📥 Received answer from:', data.sid, {
+              type: data.answer.type,
+              sdpSize: data.answer.sdp.length
+          });
+          if (data.sid !== socket.id) {
+              try {
+                  await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                  await processPendingIceCandidates(); // Process queued candidates
+                  console.log('✅ Answer processed successfully');
+                  statusElement.textContent = '✅ تم قبول الإجابة';
+              } catch (error) {
+                  console.error('❌ Error handling answer:', error);
+                  statusElement.textContent = '❌ خطأ في معالجة الإجابة';
+              }
+          } else {
+              console.log('🔄 Ignoring answer from self');
+          }
+      });
+
+      socket.on('ice_candidate', async (data) => {
+          console.log('🧊 Received ICE candidate from:', data.sid, {
+              type: data.candidate?.type,
+              protocol: data.candidate?.protocol
+          });
+
+          if (data.sid === socket.id) {
+              console.log('🔄 Ignoring ICE candidate from self');
+              return;
+          }
+
+          if (peerConnection && data.candidate) {
+              try {
+                  if (peerConnection.remoteDescription) {
+                      await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                      console.log('✅ Added ICE candidate successfully');
+                  } else {
+                      pendingIceCandidates.push(data.candidate);
+                      console.log('📦 Queued ICE candidate (waiting for remote description)');
+                  }
+              } catch (error) {
+                  console.error('❌ Error adding ICE candidate:', error);
+              }
+          } else if (data.candidate) {
+              pendingIceCandidates.push(data.candidate);
+              console.log('📦 Queued ICE candidate (no peer connection yet)');
+          }
+      });
+
+      function startTimer() {
+          timerInterval = setInterval(() => {
+              callTime++;
+              const minutes = Math.floor(callTime / 60).toString().padStart(2, '0');
+              const seconds = (callTime % 60).toString().padStart(2, '0');
+              timerElement.children[0].textContent = `${minutes}:${seconds}`;
+          }, 1000);
+      }
+
+      function toggleMic() {
+          if (localStream) {
+              isMicMuted = !isMicMuted;
+              localStream.getAudioTracks().forEach(track => {
+                  track.enabled = !isMicMuted;
+              });
+
+              const micBtn = document.getElementById('mic-btn');
+              const micIcon = document.getElementById('mic-icon');
+              const micText = document.getElementById('mic-text');
+
+              if (isMicMuted) {
+                  micBtn.classList.add('active');
+                  micIcon.textContent = '🔇';
+                  micText.textContent = 'فتح الميكروفون';
+              } else {
+                  micBtn.classList.remove('active');
+                  micIcon.textContent = '🎤';
+                  micText.textContent = 'إغلاق الميكروفون';
+              }
+          }
+      }
+
+      function toggleCamera() {
+          if (localStream) {
+              isCameraOff = !isCameraOff;
+              localStream.getVideoTracks().forEach(track => {
+                  track.enabled = !isCameraOff;
+              });
+
+              const cameraBtn = document.getElementById('camera-btn');
+              const cameraIcon = document.getElementById('camera-icon');
+              const cameraText = document.getElementById('camera-text');
+
+              if (isCameraOff) {
+                  cameraBtn.classList.add('active');
+                  cameraIcon.textContent = '🚫';
+                  cameraText.textContent = 'فتح الكاميرا';
+              } else {
+                  cameraBtn.classList.remove('active');
+                  cameraIcon.textContent = '📷';
+                  cameraText.textContent = 'إغلاق الكاميرا';
+              }
+          }
+      }
+
+      function endCall() {
+          clearInterval(timerInterval);
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => track.stop());
+          }
+
+          if (peerConnection) {
+              peerConnection.close();
+          }
+
+          alert('تم إنهاء المكالمة');
+          window.location.href = '/ARhome';
+      }
+
+      // Chat functionality (GIF translation)
+      socket.on('chat_response', (data) => {
+          console.log('📨 Received chat response:', data);
+          console.log('📨 GIF paths received:', data.gifs);
+          console.log('📨 Number of GIFs:', data.gifs ? data.gifs.length : 0);
+
+          const placeholder = document.getElementById('gif-placeholder');
+          gifContainer.innerHTML = '';
+
+          if (placeholder) {
+              placeholder.classList.add('hidden');
+          }
+
+          if (data.gifs && data.gifs.length > 0) {
+              console.log('🎬 Processing', data.gifs.length, 'GIFs');
+              data.gifs.forEach((gifPath, index) => {
+                  console.log(`🎬 Setting up GIF ${index + 1}:`, gifPath);
+                  setTimeout(() => {
+                      console.log(`🖼️ Displaying GIF ${index + 1}:`, gifPath);
+                      gifContainer.innerHTML = '';
+                      const img = document.createElement('img');
+                      img.src = gifPath;
+                      img.alt = "GIF";
+                      img.onload = () => console.log(`✅ GIF ${index + 1} loaded successfully`);
+                      img.onerror = () => console.error(`❌ Failed to load GIF ${index + 1}:`, gifPath);
+                      gifContainer.appendChild(img);
+                  }, index * 2000);
+              });
+          } else {
+              console.log('❌ No GIFs to display');
+              if (placeholder) {
+                  placeholder.textContent = 'لا توجد نتائج لعرضها';
+                  placeholder.classList.remove('hidden');
+              }
+          }
+      });
+
+      // Sign language translation (enabled) - Chat-like display
+      socket.on('sign_language_translation', (data) => {
+          console.log('✅ Received Arabic translation:', data);
+
+          const translationContainer = document.getElementById('translation-container');
+          const placeholder = document.getElementById('translation-placeholder');
+
+          if (data.sentence && data.sentence.length > 0) {
+              placeholder.style.display = 'none';
+
+              // Don't clear previous messages - keep chat history
+              // Instead, only clear the current user's partial translation if it exists
+              const existingPartial = translationContainer.querySelector(`[data-sid="${data.sid}"][data-partial="true"]`);
+              if (existingPartial) {
+                  existingPartial.remove();
+              }
+
+              // Format timestamp
+              const timestamp = new Date(data.timestamp).toLocaleTimeString('ar-EG', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+              });
+
+              // Check if this is current user's message
+              const currentUser = '{{ user.username if user else "مستخدم غير معروف" }}';
+              const isOwnMessage = data.username === currentUser;
+
+              // Add new translation message
+              const messageDiv = document.createElement('div');
+              messageDiv.className = `translation-message ${isOwnMessage ? 'own-message' : ''}`;
+              messageDiv.setAttribute('data-sid', data.sid);
+              messageDiv.setAttribute('data-complete', 'true');
+
+              messageDiv.innerHTML = `
+                  <div class="translation-header">
+                      <span class="username">${data.username}</span>
+                      <span class="timestamp">${timestamp}</span>
+                  </div>
+                  <div class="translation-content">
+                      ${data.reshaped_sentence}
+                  </div>
+                  <div class="confidence-info">
+                      الثقة: ${data.sentence.map(s => Math.round(s.confidence * 100)).join('%, ')}%
+                  </div>
+              `;
+
+              translationContainer.appendChild(messageDiv);
+
+              // Auto-scroll to bottom
+              translationContainer.scrollTop = translationContainer.scrollHeight;
+          } else {
+              placeholder.style.display = 'block';
+          }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              sendMessage();
+          }
+      });
+
+      function sendMessage() {
+          const message = chatInput.value.trim();
+          if (message) {
+              console.log('📨 Sending message:', message);
+
+              // Add visual feedback
+              gifContainer.innerHTML = '<div style="text-align: center; color: #666;">جاري البحث عن GIFs...</div>';
+
+              socket.emit('chat_message', { message });
+              chatInput.value = '';
+          }
+      }
+
+      socket.on('error', (data) => {
+          console.error('❌ Socket error:', data);
+          statusElement.textContent = `❌ خطأ: ${data.message}`;
+      });
+
+      // Video frame processing for sign language translation
+      let frameProcessingInterval;
+
+      function startFrameProcessing() {
+          if (localVideo && localVideo.srcObject) {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+
+              frameProcessingInterval = setInterval(() => {
+                  if (localVideo.videoWidth && localVideo.videoHeight) {
+                      canvas.width = localVideo.videoWidth;
+                      canvas.height = localVideo.videoHeight;
+                      ctx.drawImage(localVideo, 0, 0);
+
+                      const frameData = canvas.toDataURL('image/jpeg', 0.8);
+                      socket.emit('video_frame', { frame: frameData });
+                  }
+              }, 200); // Process every 200ms (5 FPS) - slower rate to avoid MediaPipe issues
+
+              console.log('🎬 Video frame processing ENABLED for sign language');
+          }
+      }
+
+      function stopFrameProcessing() {
+          if (frameProcessingInterval) {
+              clearInterval(frameProcessingInterval);
+              frameProcessingInterval = null;
+              console.log('🛑 Video frame processing STOPPED');
+          }
+      }
+
+      // Start frame processing when local video is ready
+      localVideo.addEventListener('loadeddata', () => {
+          setTimeout(startFrameProcessing, 1000); // Wait 1 second after video loads
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "codespaces-flask",
+  "version": "1.0.0",
+  "description": "Welcome to your shiny new Codespace running Flask! We've got everything fired up and running for you to explore Flask.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  sign-language-translator:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./Uploads:/app/Uploads
+      - ./flask_session:/app/flask_session
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    restart: unless-stopped
+    networks:
+      - sign-language-network
+
+networks:
+  sign-language-network:
+    driver: bridge 

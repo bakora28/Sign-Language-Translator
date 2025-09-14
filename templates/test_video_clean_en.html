@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test Communication - Video Only</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        direction: ltr;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        color: #202124;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+      }
+      .video-section {
+        flex: 3;
+        background-color: #ffffff;
+        padding: 10px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      #timer {
+        font-size: 16px;
+        font-weight: bold;
+        color: #000000;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #status {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      #video-feed {
+        width: 100%;
+        height: calc(100% - 90px);
+        background-color: #757575;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      #local-video,
+      #remote-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #video-placeholder {
+        max-width: 200px;
+        max-height: 200px;
+        color: white;
+      }
+      .video-overlay {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: 200px;
+        height: 150px;
+        background-color: #333;
+        border-radius: 4px;
+        overflow: hidden;
+        z-index: 10;
+      }
+      .controls {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .controls button {
+        padding: 8px 12px;
+        background-color: #ffffff;
+        color: #202124;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 100px;
+        justify-content: center;
+      }
+      .controls button:hover {
+        background-color: #e8f0fe;
+      }
+      .controls .red {
+        background-color: #c5221f;
+        color: white;
+      }
+      .controls .red:hover {
+        background-color: #a50e0b;
+      }
+      .controls .active {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        border-color: #1a73e8;
+      }
+      .controls .blue {
+        background-color: #1a73e8;
+        color: white;
+      }
+      .controls .blue:hover {
+        background-color: #1557b0;
+      }
+      .chat-section {
+        flex: 1;
+        background-color: #ffffff;
+        padding: 10px;
+        border-left: 1px solid #dadce0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .chat-input-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      #chat-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #dadce0;
+        border-radius: 20px;
+        background-color: #f1f3f4;
+        margin-bottom: 0;
+        font-size: 14px;
+      }
+      #send-btn {
+        padding: 10px 20px;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #send-btn:hover {
+        background-color: #1557b0;
+      }
+      .video-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-height: 60%;
+      }
+      .video-container video {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin: 5px 0;
+      }
+      .translation-section {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        margin-top: 10px;
+        max-height: 40%;
+        border: 1px solid #dadce0;
+        direction: ltr;
+        text-align: left;
+      }
+      .translation-message {
+        margin: 8px 0;
+        padding: 12px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        font-size: 14px;
+        direction: ltr;
+        text-align: left;
+        border-left: 3px solid #1a73e8;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .translation-message.own-message {
+        background-color: #e3f2fd;
+        border-left: 3px solid #2196f3;
+      }
+
+      .translation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .username {
+        font-weight: bold;
+        color: #1a73e8;
+      }
+
+      .timestamp {
+        font-size: 11px;
+        color: #999;
+      }
+
+      .translation-content {
+        font-size: 15px;
+        line-height: 1.4;
+        margin: 6px 0;
+      }
+
+      .confidence-info {
+        font-size: 11px;
+        color: #666;
+        margin-top: 4px;
+        font-style: italic;
+      }
+      .hidden {
+        display: none;
+      }
+      .info-panel {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 100;
+      }
+      .test-notice {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(255, 165, 0, 0.9);
+        color: black;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 11px;
+        z-index: 100;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="video-section">
+        <div id="timer">
+          <span>00:00</span>
+          <span id="status">Test - Waiting for connection</span>
+        </div>
+        <div id="video-feed">
+          <div id="video-placeholder">Waiting for video...</div>
+          <video id="remote-video" autoplay playsinline class="hidden"></video>
+          <div class="video-overlay">
+            <video
+              id="local-video"
+              autoplay
+              playsinline
+              muted
+              class="hidden"
+            ></video>
+          </div>
+          <div class="info-panel">
+            <div>User: {{ user.username if user else 'Unknown' }}</div>
+            <div>UID: {{ user.uid if user else 'Unknown' }}</div>
+            <div>Room: {{ test_room }}</div>
+            <div>Initiator: {{ 'Yes' if is_initiator else 'No' }}</div>
+          </div>
+          <div class="test-notice">
+            🔒 Test Mode<br />
+            📹 Video + English Sign Language + Videos
+          </div>
+        </div>
+        <div class="controls">
+          <button id="mic-btn" class="blue" onclick="toggleMic()">
+            <span id="mic-icon">🎤</span>
+            <span id="mic-text">Mute Microphone</span>
+          </button>
+          <button id="camera-btn" class="blue" onclick="toggleCamera()">
+            <span id="camera-icon">📷</span>
+            <span id="camera-text">Turn Off Camera</span>
+          </button>
+          <button id="end-call-btn" class="red" onclick="endCall()">
+            <span>📞</span> End Call
+          </button>
+        </div>
+      </div>
+      <div class="chat-section">
+        <div class="chat-input-container">
+          <input type="text" id="chat-input" placeholder="Type your message here..." />
+          <button id="send-btn">Send</button>
+          <button id="gif-btn" style="margin-left: 5px; background-color: #4CAF50; color: white;">GIF</button>
+        </div>
+        <div class="gif-container" id="gif-container" style="max-height: 30%; overflow-y: auto; padding: 10px; background-color: #f9f9f9; border-radius: 8px; margin-bottom: 10px; border: 1px solid #dadce0; display: none;">
+          <div id="gif-placeholder">
+            🎬 English Sign Language GIFs
+            <br /><small>Type a message and click GIF to see sign language animations</small>
+          </div>
+        </div>
+        <div class="video-container" id="video-container">
+          <div id="video-placeholder">Sign language videos will appear here when you send a message</div>
+        </div>
+        <div class="translation-section" id="translation-container">
+          <div id="translation-placeholder">
+            💬 Sign Language Translation Chat
+            <br /><small>English sign language translations will appear here with usernames</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      // Test configuration
+      const testRoom = "{{ test_room }}";
+      const currentUserUid = "{{ user.uid if user else '' }}";
+      const otherUserUid = "{{ other_user_uid }}";
+      const isInitiator = {{ 'true' if is_initiator else 'false' }};
+
+      console.log('🔒 TEST MODE: All features ENABLED');
+      console.log('📹 FOCUS: WebRTC video streaming + English Sign language + Videos');
+      console.log('Test Video Configuration:', {
+          testRoom,
+          currentUserUid,
+          otherUserUid,
+          isInitiator
+      });
+
+      // WebRTC configuration with TURN servers for remote connections
+      let peerConnection;
+      const iceServers = {
+          iceServers: [
+            {
+                urls: "stun:stun.relay.metered.ca:80",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:80",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+            {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "380b6391ca3caa7568949b9c",
+                credential: "soD20ezgapr09mBk",
+            },
+        ],
+          iceCandidatePoolSize: 10,
+          bundlePolicy: 'max-bundle',
+          rtcpMuxPolicy: 'require'
+      };
+
+      // Socket and video elements
+      const socket = io('/video');
+      let localVideo = document.getElementById('local-video');
+      let remoteVideo = document.getElementById('remote-video');
+      let statusElement = document.getElementById('status');
+      let timerElement = document.getElementById('timer');
+      let chatInput = document.getElementById('chat-input');
+      let sendBtn = document.getElementById('send-btn');
+      let videoContainer = document.getElementById('video-container');
+
+      // State variables
+      let localStream = null;
+      let isMicMuted = false;
+      let isCameraOff = false;
+      let callTime = 0;
+      let timerInterval;
+      let remoteUserSid = null;
+      let pendingIceCandidates = []; // Queue for ICE candidates received before peer connection is ready
+
+      // Function to check permissions and browser compatibility
+      async function checkCameraPermissions() {
+          console.log('🔍 Checking camera permissions and browser compatibility...');
+          
+          // Check HTTPS
+          if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+              console.warn('⚠️ Not using HTTPS - camera may not work');
+              statusElement.textContent = '⚠️ May need HTTPS for camera';
+              
+              const httpsWarning = document.createElement('div');
+              httpsWarning.style.cssText = `
+                  position: fixed;
+                  top: 10px;
+                  right: 10px;
+                  background: #ff9800;
+                  color: white;
+                  padding: 10px;
+                  border-radius: 5px;
+                  font-size: 12px;
+                  z-index: 1000;
+                  max-width: 300px;
+                  direction: ltr;
+              `;
+              httpsWarning.innerHTML = `
+                  <strong>⚠️ Security Warning</strong><br>
+                  You may need HTTPS to access the camera<br>
+                  <small>Try: https://${location.host}${location.pathname}</small>
+              `;
+              document.body.appendChild(httpsWarning);
+              
+              setTimeout(() => httpsWarning.remove(), 10000);
+          }
+
+          // Check navigator.mediaDevices support
+          if (!navigator.mediaDevices) {
+              throw new Error('navigator.mediaDevices not supported in this browser');
+          }
+
+          // Check getUserMedia support  
+          if (!navigator.mediaDevices.getUserMedia) {
+              throw new Error('getUserMedia not supported in this browser');
+          }
+
+          console.log('✅ Permission checks completed');
+          return true;
+      }
+
+      // Initialize
+      socket.on('connect', () => {
+          console.log('Connected to /video namespace');
+          statusElement.textContent = 'Connected - checking permissions...';
+
+          checkCameraPermissions()
+              .then(() => {
+                  console.log('✅ Permission checks passed, initializing video...');
+                  statusElement.textContent = 'Permission checks completed - setting up camera...';
+                  return initVideoCall();
+              })
+              .then(() => {
+                  console.log('✅ Video initialization completed, joining room...');
+                  statusElement.textContent = 'Ready - joining room';
+                  joinTestRoom();
+              })
+              .catch(error => {
+                  console.error('❌ Initialization failed:', error);
+                  statusElement.textContent = 'Failed initial setup - check console for details';
+                  showDetailedErrorDialog(error, 'Failed initial setup');
+              });
+      });
+
+      async function initVideoCall() {
+          try {
+              // Check if getUserMedia is available
+              if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                  throw new Error('getUserMedia is not supported in this browser');
+              }
+
+              console.log('🎥 Requesting camera and microphone access...');
+              statusElement.textContent = 'Requesting camera and microphone access...';
+
+              // Request permissions with specific constraints
+              const constraints = {
+                  video: {
+                      width: { ideal: 1280, max: 1920 },
+                      height: { ideal: 720, max: 1080 },
+                      frameRate: { ideal: 30, max: 60 }
+                  },
+                  audio: {
+                      echoCancellation: true,
+                      noiseSuppression: true,
+                      autoGainControl: true
+                  }
+              };
+
+              localStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+              // Check if we got both video and audio tracks
+              const videoTracks = localStream.getVideoTracks();
+              const audioTracks = localStream.getAudioTracks();
+
+              console.log(`✅ Media access granted - Video: ${videoTracks.length}, Audio: ${audioTracks.length}`);
+
+              if (videoTracks.length === 0) {
+                  throw new Error('No video track available');
+              }
+
+              localVideo.srcObject = localStream;
+              localVideo.classList.remove('hidden');
+              document.querySelector('.video-overlay').classList.remove('hidden');
+              document.getElementById('video-placeholder').style.display = 'none';
+
+              console.log('✅ Local video initialized successfully');
+              statusElement.textContent = 'Camera setup successful';
+              return Promise.resolve();
+          } catch (error) {
+              console.error('❌ Error accessing media devices:', error);
+              statusElement.textContent = 'Failed to setup camera - check troubleshooting dialog';
+              return Promise.reject(error);
+          }
+      }
+
+      function joinTestRoom() {
+          socket.emit('join_test_room', {
+              user_uid: currentUserUid,
+              test_room: testRoom
+          });
+      }
+
+      socket.on('test_room_ready', (data) => {
+          console.log('Test room ready:', data);
+          statusElement.textContent = 'Room ready - ' + data.all_participants.length + ' participants';
+
+          if (data.can_initiate && isInitiator) {
+              statusElement.textContent = 'Starting call...';
+              setTimeout(() => {
+                  startCall();
+              }, 1000);
+          } else {
+              statusElement.textContent = 'Waiting for call...';
+          }
+      });
+
+      socket.on('waiting_for_other_user', (data) => {
+          console.log('Waiting for other user:', data);
+          statusElement.textContent = 'Waiting for other user...';
+      });
+
+      function createPeerConnection() {
+          console.log('🔧 Creating peer connection...');
+          peerConnection = new RTCPeerConnection(iceServers);
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => {
+                  console.log('➕ Adding local track:', track.kind);
+                  peerConnection.addTrack(track, localStream);
+              });
+          }
+
+          peerConnection.onicecandidate = (event) => {
+              if (event.candidate) {
+                  console.log('🧊 Sending ICE candidate');
+                  socket.emit('ice_candidate', {
+                      candidate: event.candidate
+                  });
+              }
+          };
+
+          peerConnection.ontrack = (event) => {
+              console.log('✅ Received remote stream:', event.streams[0]);
+              remoteVideo.srcObject = event.streams[0];
+              remoteVideo.classList.remove('hidden');
+              statusElement.textContent = '✅ Connected successfully';
+              startTimer();
+          };
+
+          peerConnection.onconnectionstatechange = () => {
+              console.log('🔗 Connection state:', peerConnection.connectionState);
+              if (peerConnection.connectionState === 'connected') {
+                  statusElement.textContent = '✅ Connected successfully';
+              } else if (peerConnection.connectionState === 'disconnected') {
+                  statusElement.textContent = '❌ Connection lost';
+              } else if (peerConnection.connectionState === 'failed') {
+                  statusElement.textContent = '❌ Connection failed';
+                  console.error('❌ Connection failed - trying to restart ICE');
+                  peerConnection.restartIce();
+              } else if (peerConnection.connectionState === 'connecting') {
+                  statusElement.textContent = '🔄 Connecting...';
+              }
+          };
+      }
+
+      async function startCall() {
+          console.log('🚀 Starting call as initiator');
+          createPeerConnection();
+
+          try {
+              const offer = await peerConnection.createOffer({
+                  offerToReceiveAudio: true,
+                  offerToReceiveVideo: true,
+                  iceRestart: false
+              });
+              await peerConnection.setLocalDescription(offer);
+
+              console.log('📤 Sending offer...');
+              socket.emit('offer', {
+                  offer: offer
+              });
+
+              statusElement.textContent = '📤 Offer sent';
+          } catch (error) {
+              console.error('❌ Error creating offer:', error);
+              statusElement.textContent = '❌ Error creating offer';
+          }
+      }
+
+      async function processPendingIceCandidates() {
+          while (pendingIceCandidates.length > 0 && peerConnection && peerConnection.remoteDescription) {
+              const candidate = pendingIceCandidates.shift();
+              try {
+                  await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                  console.log('✅ Added queued ICE candidate');
+              } catch (error) {
+                  console.error('❌ Error adding queued ICE candidate:', error);
+              }
+          }
+      }
+
+      socket.on('offer', async (data) => {
+          console.log('📥 Received offer from:', data.sid);
+          if (data.sid !== socket.id) {
+              remoteUserSid = data.sid;
+              createPeerConnection();
+
+              try {
+                  await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                  await processPendingIceCandidates();
+
+                  const answer = await peerConnection.createAnswer({
+                      offerToReceiveAudio: true,
+                      offerToReceiveVideo: true
+                  });
+                  await peerConnection.setLocalDescription(answer);
+
+                  console.log('📤 Sending answer...');
+                  socket.emit('answer', {
+                      answer: answer
+                  });
+
+                  statusElement.textContent = '📤 Answer sent';
+              } catch (error) {
+                  console.error('❌ Error handling offer:', error);
+                  statusElement.textContent = '❌ Error handling offer';
+              }
+          }
+      });
+
+      socket.on('answer', async (data) => {
+          console.log('📥 Received answer from:', data.sid);
+          if (data.sid !== socket.id) {
+              try {
+                  await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                  await processPendingIceCandidates();
+                  console.log('✅ Answer processed successfully');
+                  statusElement.textContent = '✅ Answer accepted';
+              } catch (error) {
+                  console.error('❌ Error handling answer:', error);
+                  statusElement.textContent = '❌ Error handling answer';
+              }
+          }
+      });
+
+      socket.on('ice_candidate', async (data) => {
+          console.log('🧊 Received ICE candidate from:', data.sid);
+
+          if (data.sid === socket.id) {
+              return;
+          }
+
+          if (peerConnection && data.candidate) {
+              try {
+                  if (peerConnection.remoteDescription) {
+                      await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                      console.log('✅ Added ICE candidate successfully');
+                  } else {
+                      pendingIceCandidates.push(data.candidate);
+                      console.log('📦 Queued ICE candidate');
+                  }
+              } catch (error) {
+                  console.error('❌ Error adding ICE candidate:', error);
+              }
+          } else if (data.candidate) {
+              pendingIceCandidates.push(data.candidate);
+          }
+      });
+
+      function startTimer() {
+          timerInterval = setInterval(() => {
+              callTime++;
+              const minutes = Math.floor(callTime / 60).toString().padStart(2, '0');
+              const seconds = (callTime % 60).toString().padStart(2, '0');
+              timerElement.children[0].textContent = `${minutes}:${seconds}`;
+          }, 1000);
+      }
+
+      function toggleMic() {
+          if (localStream) {
+              isMicMuted = !isMicMuted;
+              localStream.getAudioTracks().forEach(track => {
+                  track.enabled = !isMicMuted;
+              });
+
+              const micBtn = document.getElementById('mic-btn');
+              const micIcon = document.getElementById('mic-icon');
+              const micText = document.getElementById('mic-text');
+
+              if (isMicMuted) {
+                  micBtn.classList.add('active');
+                  micIcon.textContent = '🔇';
+                  micText.textContent = 'Unmute Microphone';
+              } else {
+                  micBtn.classList.remove('active');
+                  micIcon.textContent = '🎤';
+                  micText.textContent = 'Mute Microphone';
+              }
+          }
+      }
+
+      function toggleCamera() {
+          if (localStream) {
+              isCameraOff = !isCameraOff;
+              localStream.getVideoTracks().forEach(track => {
+                  track.enabled = !isCameraOff;
+              });
+
+              const cameraBtn = document.getElementById('camera-btn');
+              const cameraIcon = document.getElementById('camera-icon');
+              const cameraText = document.getElementById('camera-text');
+
+              if (isCameraOff) {
+                  cameraBtn.classList.add('active');
+                  cameraIcon.textContent = '🚫';
+                  cameraText.textContent = 'Turn On Camera';
+              } else {
+                  cameraBtn.classList.remove('active');
+                  cameraIcon.textContent = '📷';
+                  cameraText.textContent = 'Turn Off Camera';
+              }
+          }
+      }
+
+      function endCall() {
+          clearInterval(timerInterval);
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => track.stop());
+          }
+
+          if (peerConnection) {
+              peerConnection.close();
+          }
+
+          alert('Call ended');
+          window.location.href = '/ENhome';
+      }
+
+      // Enhanced error dialog
+      function showDetailedErrorDialog(error, context) {
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = `
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: #fff;
+              border: 2px solid #e74c3c;
+              border-radius: 10px;
+              padding: 20px;
+              max-width: 700px;
+              max-height: 80vh;
+              overflow-y: auto;
+              text-align: center;
+              font-family: Arial, sans-serif;
+              z-index: 1000;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          `;
+
+          errorDiv.innerHTML = `
+              <h3 style="color: #e74c3c; margin: 0 0 15px 0;">❌ ${context}</h3>
+              <div style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                  <h4>Error Information:</h4>
+                  <p><strong>Error Type:</strong> ${error.name || 'Unknown'}</p>
+                  <p><strong>Error Message:</strong> ${error.message || 'Unknown'}</p>
+                  <p><strong>Context:</strong> ${context}</p>
+              </div>
+              
+              <div style="margin-top: 20px;">
+                  <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">🔄 Retry</button>
+                  <button onclick="this.parentElement.parentElement.remove()" style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">✖️ Close</button>
+              </div>
+          `;
+
+          document.body.appendChild(errorDiv);
+      }
+
+      // English text to sign language GIF functionality
+      socket.on('english_sign_video_response', (data) => {
+          console.log('📨 Received English sign response:', data);
+          
+          const placeholder = document.getElementById('video-placeholder');
+          videoContainer.innerHTML = '';
+
+          if (placeholder) {
+              placeholder.style.display = 'none';
+          }
+
+          if (data.success && data.gif_data && data.gif_data.length > 0) {
+              console.log('🎬 Processing sign language GIFs:', data.gif_data);
+              
+              // Create header with stats
+              const headerDiv = document.createElement('div');
+              headerDiv.style.cssText = `
+                  background: #d4edda;
+                  border: 1px solid #c3e6cb;
+                  border-radius: 8px;
+                  padding: 12px;
+                  margin: 10px 0;
+                  text-align: center;
+              `;
+              headerDiv.innerHTML = `
+                  <h4 style="color: #155724; margin: 0 0 8px 0;">✅ English Sign Language</h4>
+                  <p style="color: #155724; margin: 0; font-size: 14px;"><strong>Text:</strong> "${data.original_text}"</p>
+                  <p style="color: #155724; margin: 5px 0 0 0; font-size: 12px;">
+                      Found: ${data.found_count}/${data.total_count} words (${data.success_rate}% success rate)
+                  </p>
+              `;
+              videoContainer.appendChild(headerDiv);
+              
+              // Add concatenated GIF if available
+              if (data.video_path) {
+                  const gifDiv = document.createElement('div');
+                  gifDiv.style.cssText = `
+                      background: #fff;
+                      border-radius: 8px;
+                      padding: 15px;
+                      margin: 10px 0;
+                      text-align: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                  `;
+                  
+                  // Check if it's a GIF or video
+                  const isGif = data.video_path.endsWith('.gif');
+                  
+                  if (isGif) {
+                      gifDiv.innerHTML = `
+                          <h5 style="color: #1a73e8; margin: 0 0 10px 0;">🎭 Sign Language Translation</h5>
+                          <img src="${data.video_path}" alt="Sign Language Sequence" 
+                               style="width: 100%; max-width: 500px; border-radius: 8px; border: 2px solid #e3f2fd;">
+                      `;
+                  } else {
+                      gifDiv.innerHTML = `
+                          <h5 style="color: #1a73e8; margin: 0 0 10px 0;">🎬 Sign Language Video</h5>
+                          <video controls autoplay style="width: 100%; max-width: 500px; border-radius: 8px;">
+                              <source src="${data.video_path}" type="video/mp4">
+                              Your browser does not support the video tag.
+                          </video>
+                      `;
+                  }
+                  
+                  videoContainer.appendChild(gifDiv);
+              }
+              
+
+              
+          } else {
+              console.log('❌ No GIFs to display or generation failed');
+              showGIFGenerationError(data.original_text || 'Unknown text');
+          }
+      });
+      
+      // Helper function to show video error
+      function showVideoError(originalText, videoPath) {
+          videoContainer.innerHTML = '';
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = `
+              background: #f8d7da;
+              border: 1px solid #f5c6cb;
+              border-radius: 8px;
+              padding: 15px;
+              margin: 10px 0;
+              text-align: center;
+          `;
+          errorDiv.innerHTML = `
+              <h4 style="color: #721c24; margin: 0 0 10px 0;">❌ Video Loading Error</h4>
+              <p style="color: #721c24; margin: 5px 0;"><strong>Text:</strong> "${originalText}"</p>
+              <p style="color: #721c24; margin: 5px 0;"><strong>Video Path:</strong> ${videoPath}</p>
+              <p style="color: #721c24; margin: 5px 0; font-size: 12px;">The video file could not be loaded. Check console for details.</p>
+              <button onclick="retryVideoGeneration('${originalText}')" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-top: 10px; cursor: pointer;">🔄 Retry</button>
+          `;
+          videoContainer.appendChild(errorDiv);
+      }
+      
+      // Helper function to show generation error
+      function showGIFGenerationError(originalText) {
+          videoContainer.innerHTML = '';
+          const errorDiv = document.createElement('div');
+          errorDiv.style.cssText = `
+              background: #f8d7da;
+              border: 1px solid #f5c6cb;
+              border-radius: 8px;
+              padding: 15px;
+              margin: 10px 0;
+              text-align: center;
+          `;
+          errorDiv.innerHTML = `
+              <h4 style="color: #721c24; margin: 0 0 10px 0;">❌ Sign Language Content Not Found</h4>
+              <p style="color: #721c24; margin: 5px 0;"><strong>Text:</strong> "${originalText}"</p>
+              <p style="color: #721c24; margin: 5px 0; font-size: 12px;">No sign language GIFs found for this text. The gif_ASL directory may not contain the required words.</p>
+              <div style="margin-top: 10px;">
+                  <button onclick="retryGIFGeneration('${originalText}')" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin: 5px; cursor: pointer;">🔄 Retry</button>
+              </div>
+          `;
+          videoContainer.appendChild(errorDiv);
+      }
+      
+      // Helper function to retry GIF generation
+      function retryGIFGeneration(text) {
+          console.log('🔄 Retrying GIF generation for:', text);
+          videoContainer.innerHTML = '<div style="text-align: center; color: #666;">🔄 Retrying sign language GIF generation...</div>';
+          
+          socket.emit('english_text_to_sign_video', { 
+              message: text,
+              language: 'english'
+          });
+      }
+      
+
+      
+      // Helper function to show ASL setup instructions
+      function showASLSetupInstructions() {
+          const instructionsDiv = document.createElement('div');
+          instructionsDiv.style.cssText = `
+              position: fixed;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: #fff;
+              border: 2px solid #007bff;
+              border-radius: 10px;
+              padding: 20px;
+              max-width: 600px;
+              max-height: 80vh;
+              overflow-y: auto;
+              text-align: left;
+              font-family: Arial, sans-serif;
+              z-index: 1000;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          `;
+          
+          instructionsDiv.innerHTML = `
+              <h3 style="color: #007bff; margin: 0 0 15px 0;">📚 ASL Video Setup Instructions</h3>
+              
+              <h4>Quick Start:</h4>
+              <ol>
+                  <li>Run <code>python setup_asl_videos.py</code> in your project directory</li>
+                  <li>Check <code>static/asl_videos/required_videos.txt</code> for needed files</li>
+                  <li>Add ASL video files (MP4 format) to <code>static/asl_videos/</code></li>
+                  <li>Retry video generation</li>
+              </ol>
+              
+              <h4>Priority ASL Videos to Add:</h4>
+              <ul>
+                  <li><code>asl_hello.mp4</code> - for "hello"</li>
+                  <li><code>asl_thank.mp4</code> - for "thank"</li>
+                  <li><code>asl_you.mp4</code> - for "you"</li>
+                  <li><code>asl_please.mp4</code> - for "please"</li>
+                  <li><code>asl_yes.mp4</code> - for "yes"</li>
+                  <li><code>asl_no.mp4</code> - for "no"</li>
+              </ul>
+              
+              <h4>Video Requirements:</h4>
+              <ul>
+                  <li><strong>Format:</strong> MP4 (H.264 codec)</li>
+                  <li><strong>Duration:</strong> 2-5 seconds per word</li>
+                  <li><strong>Resolution:</strong> 640x480 minimum</li>
+                  <li><strong>Quality:</strong> Clear ASL demonstration</li>
+              </ul>
+              
+              <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                  For detailed instructions, check <code>ASL_SETUP_README.md</code> in your project directory.
+              </p>
+              
+              <div style="margin-top: 20px; text-align: center;">
+                  <button onclick="this.parentElement.parentElement.remove()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">✖️ Close</button>
+              </div>
+          `;
+          
+          document.body.appendChild(instructionsDiv);
+      }
+
+      // Sign language translation (English) - Chat-like display
+      socket.on('sign_language_translation', (data) => {
+          console.log('✅ Received English translation:', data);
+
+          const translationContainer = document.getElementById('translation-container');
+          const placeholder = document.getElementById('translation-placeholder');
+
+          if (data.sentence && data.sentence.length > 0) {
+              placeholder.style.display = 'none';
+
+              // Don't clear previous messages - keep chat history
+              const existingPartial = translationContainer.querySelector(`[data-sid="${data.sid}"][data-partial="true"]`);
+              if (existingPartial) {
+                  existingPartial.remove();
+              }
+
+              // Format timestamp
+              const timestamp = new Date(data.timestamp).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+              });
+
+              // Check if this is current user's message
+              const currentUser = '{{ user.username if user else "Unknown User" }}';
+              const isOwnMessage = data.username === currentUser;
+
+              // Add new translation message
+              const messageDiv = document.createElement('div');
+              messageDiv.className = `translation-message ${isOwnMessage ? 'own-message' : ''}`;
+              messageDiv.setAttribute('data-sid', data.sid);
+              messageDiv.setAttribute('data-complete', 'true');
+
+              messageDiv.innerHTML = `
+                  <div class="translation-header">
+                      <span class="username">${data.username}</span>
+                      <span class="timestamp">${timestamp}</span>
+                  </div>
+                  <div class="translation-content">
+                      ${data.translated_text || data.reshaped_sentence || 'Translation not available'}
+                  </div>
+                  <div class="confidence-info">
+                      Confidence: ${data.sentence.map(s => Math.round(s.confidence * 100)).join('%, ')}%
+                  </div>
+              `;
+
+              translationContainer.appendChild(messageDiv);
+
+              // Auto-scroll to bottom
+              translationContainer.scrollTop = translationContainer.scrollHeight;
+          } else {
+              placeholder.style.display = 'block';
+          }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+      chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              sendMessage();
+          }
+      });
+
+      // GIF functionality
+      const gifBtn = document.getElementById('gif-btn');
+      const gifContainer = document.getElementById('gif-container');
+      const gifPlaceholder = document.getElementById('gif-placeholder');
+
+      gifBtn.addEventListener('click', generateGIFs);
+
+      function generateGIFs() {
+          const message = chatInput.value.trim();
+          if (!message) {
+              alert('Please type a message first!');
+              return;
+          }
+
+          console.log('🎬 Generating GIFs for English text:', message);
+          
+          // Show GIF container and add loading message
+          gifContainer.style.display = 'block';
+          gifPlaceholder.style.display = 'none';
+          gifContainer.innerHTML = '<div style="text-align: center; color: #666;">🔄 Generating English sign language GIFs...</div>';
+
+          // Send request to backend
+          socket.emit('english_text_to_gif', { 
+              text: message,
+              language: 'english'
+          });
+      }
+
+      // Handle GIF response
+      socket.on('english_gif_response', (data) => {
+          console.log('✅ Received English GIF response:', data);
+          
+          if (data.gif_data && data.gif_data.length > 0) {
+              let gifHTML = `
+                  <div class="gif-header" style="margin-bottom: 10px; padding: 10px; background: #e3f2fd; border-radius: 5px;">
+                      <strong>🎬 "${data.original_text}"</strong>
+                      <br><small>Found ${data.found_count}/${data.total_count} GIFs (${data.success_rate.toFixed(1)}% success rate)</small>
+                  </div>
+                  <div class="gif-grid" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+              `;
+              
+              data.gif_data.forEach((item, index) => {
+                  if (item.found) {
+                      gifHTML += `
+                          <div class="gif-item" style="text-align: center; margin: 5px;">
+                              <div style="font-weight: bold; margin-bottom: 5px; color: #2196F3;">${item.word}</div>
+                              <img src="${item.gif_path}" alt="${item.word}" style="max-width: 120px; max-height: 120px; border: 2px solid #4CAF50; border-radius: 8px;" />
+                          </div>
+                      `;
+                  } else {
+                      gifHTML += `
+                          <div class="gif-item" style="text-align: center; margin: 5px;">
+                              <div style="font-weight: bold; margin-bottom: 5px; color: #f44336;">${item.word}</div>
+                              <div style="width: 120px; height: 120px; border: 2px dashed #f44336; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #f44336; font-size: 12px;">
+                                  No GIF<br>Found
+                              </div>
+                          </div>
+                      `;
+                  }
+              });
+              
+              gifHTML += '</div>';
+              
+              if (data.found_count < data.total_count) {
+                  gifHTML += `
+                      <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 5px; font-size: 12px;">
+                          ⚠️ Some words don't have GIFs yet. Missing: ${data.gif_data.filter(item => !item.found).map(item => item.word).join(', ')}
+                      </div>
+                  `;
+              }
+              
+              gifContainer.innerHTML = gifHTML;
+          } else {
+              gifContainer.innerHTML = '<div style="text-align: center; color: #f44336;">❌ No GIFs found for this text</div>';
+          }
+      });
+
+      // Handle GIF errors
+      socket.on('english_gif_error', (data) => {
+          console.error('❌ GIF generation error:', data);
+          gifContainer.innerHTML = `<div style="text-align: center; color: #f44336;">❌ Error: ${data.error}</div>`;
+      });
+
+      function sendMessage() {
+          const message = chatInput.value.trim();
+          if (message) {
+              console.log('📨 Sending English message for sign video:', message);
+
+              // Add visual feedback
+              videoContainer.innerHTML = '<div style="text-align: center; color: #666;">Generating sign language video...</div>';
+
+              // Send to backend for English sign language video generation
+              socket.emit('english_text_to_sign_video', { 
+                  message: message,
+                  language: 'english'
+              });
+              
+              chatInput.value = '';
+          }
+      }
+
+      socket.on('error', (data) => {
+          console.error('❌ Socket error:', data);
+          statusElement.textContent = `❌ Error: ${data.message}`;
+      });
+
+      // Video frame processing for English sign language translation
+      let frameProcessingInterval;
+
+      function startFrameProcessing() {
+          if (localVideo && localVideo.srcObject) {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+
+              frameProcessingInterval = setInterval(() => {
+                  if (localVideo.videoWidth && localVideo.videoHeight) {
+                      canvas.width = localVideo.videoWidth;
+                      canvas.height = localVideo.videoHeight;
+                      ctx.drawImage(localVideo, 0, 0);
+
+                      const frameData = canvas.toDataURL('image/jpeg', 0.8);
+                      socket.emit('english_video_frame', { 
+                          frame: frameData,
+                          language: 'english'
+                      });
+                  }
+              }, 200); // Process every 200ms (5 FPS)
+
+              console.log('🎬 English video frame processing ENABLED for sign language');
+          }
+      }
+
+      function stopFrameProcessing() {
+          if (frameProcessingInterval) {
+              clearInterval(frameProcessingInterval);
+              frameProcessingInterval = null;
+              console.log('🛑 Video frame processing STOPPED');
+          }
+      }
+
+      // Start frame processing when local video is ready
+      localVideo.addEventListener('loadeddata', () => {
+          setTimeout(startFrameProcessing, 1000);
+      });
+    </script>
+  </body>
+</html> 

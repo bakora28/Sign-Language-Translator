@@ -1,0 +1,98 @@
+# Dataset and Video folders (exclude these)
+gif_ASL/
+static/gif/
+static/english_sign_videos/
+Uploads/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+sign_lang_env/
+venv/
+env/
+ENV/
+
+# Flask session files
+flask_session/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Installers and executables
+*.exe
+*.msi
+*.dmg
+*.pkg
+
+# Firebase keys (security)
+*firebase-adminsdk*.json
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Batch files (temporary)
+*.bat
+
+# PowerShell scripts (temporary)
+*.ps1
+
+# Cache directories
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

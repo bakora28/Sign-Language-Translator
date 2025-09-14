@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.venv
+pip-log.txt
+
+# Node.js (since we're ignoring the Node.js server)
+node_modules
+package.json
+package-lock.json
+server.js
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Session files (will be mounted as volume)
+flask_session/*
+
+# Uploads (will be mounted as volume)
+Uploads/*
+!Uploads/.gitkeep 

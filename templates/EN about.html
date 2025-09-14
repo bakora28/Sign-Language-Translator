@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>About - tawasol</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" type="image/png" href="static/log.png">
+
+    <style>
+        header {
+            background-color: rgba(0, 123, 255, 0.9);
+            color: white;
+            padding: 40px 15px;
+            text-align: center;
+            border-bottom: 2px solid #0056b3;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://www.microsoft.com/en-us/research/uploads/prod/2023/11/SLD-BlogHeroFeature-1400x788-1.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            color: #333;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 120px;
+            padding-bottom: 60px;
+        }
+
+        footer {
+            background-color: rgba(51, 51, 51, 0.9);
+            color: white;
+            padding: 10px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auth-container, 
+        .lang-login-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn, 
+        .my-btn,
+        .user-dropdown-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .my-btn-primary,
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .my-btn-light {
+            box-shadow: none;
+            outline: none;
+            border: none;
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .my-btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .my-btn-primary:hover,
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .my-btn-light:hover {
+            background-color: #007bff;
+        }
+
+        .my-btn-danger:hover {
+            background-color: #bb2d3b;
+        }
+
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content,
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            right: 0;
+        }
+
+        .dropdown-item{
+            background-color: #ffffff;
+        }
+        .dropdown-content a {
+            padding: 8px 16px;
+            color: #000;
+            text-decoration: none;
+            display: block;
+            font-weight: bold;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-content a:hover {
+            background-color: #0080ff;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .user-dropdown:hover .dropdown-content,
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .content-card,
+        .login-card,
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .content-card:hover,
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-card h2,
+        .modal-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content-card p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .welcome-message {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            margin-left: 20px;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .action-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            font-size: 1.1rem;
+        }
+
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            width: 300px;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .text-end {
+            text-align: right;
+        }
+
+        .lang-btn {
+            background: #0056b3;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            height: 40px;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .lang-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #call-request-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            max-width: 400px;
+        }
+                .content-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .content-card h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content-card p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+   <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="static/log.png" alt="Logo" style="width: 80px; height: 60px; border-radius: 0%;">
+            <a href="/ENhome" style="text-decoration: none; font-size: 35px; font-weight: bold; color: #ffffff;">
+                tawasol
+            </a>
+    </div>
+
+    <div class="lang-login-container" style="gap: 10px;">
+    <a href="/ARabout" class="lang-btn">عربي</a>
+
+        {% if user %}
+        <div class="dropdown">
+    <button class="my-btn my-btn-light dropdown-toggle lang-btn" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        {{ user.username if user and user.username else uesrname }}
+    </button>
+    <ul class="dropdown-menu text-end" aria-labelledby="userDropdown">
+        <li><a class="dropdown-item" href="/ENchats">Chats</a></li>
+        <li><a class="dropdown-item" href="/ENfeedback">Feedback</a></li>
+        <li><a class="dropdown-item" href="/ENlogout">Log Out</a></li>
+    </ul>
+    </div>
+
+        {% else %}
+        <a href="/ENlogin" class="btn btn-primary btn-sm">Log In</a>
+        {% endif %}
+    </div>
+</header>
+
+
+    <div class="content-card">
+        <h1>About "tawasol" - Bridging Communication through Sign Language</h1>
+        <p>"tawasol" is an innovative platform aimed at facilitating communication between sign language users and those who wish to understand or learn it. We provide intelligent tools based on artificial intelligence and machine learning technologies to convert hand gestures into text or audible speech, and vice versa, contributing to breaking down barriers between the deaf community and speakers.</p>
+        <h2>Our Key Features:</h2>
+        <ol>
+            <li>
+                <strong>Sign Language Predictor with Images</strong>
+                <p>You can upload an image of a hand gesture, and our intelligent system will analyze it and predict the corresponding sign, helping to interpret sign language accurately and quickly.</p>
+            </li>
+            <li>
+                <strong>Text Translation to Sign Language</strong>
+                <p>Enter the sentence you want to convey, and we will convert it into a series of illustrative videos of gestures, making communication learning easier and more interactive.</p>
+            </li>
+            <li>
+                <strong>Video Call with Instant Translation</strong>
+                <p>We offer a video chat service with friends or colleagues with instant translation of signs into text or voice, and vice versa, ensuring smooth and effective communication.</p>
+            </li>
+            <li>
+                <strong>Learning Sign Language</strong>
+                <p>We provide educational resources and interactive exercises to help users master sign language step by step.</p>
+            </li>
+        </ol>
+        <h2>Our Vision:</h2>
+        <p>At "tawasol", we believe that communication is a right for everyone, and we strive to build a digital bridge that connects the deaf community with the wider society, using technology to enhance inclusion and mutual understanding.</p>
+        <p>Join us today and contribute to making the world a more connected and closer place!</p>
+    </div>
+            <footer>
+        <p>&copy; 2025 tawasol. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="/ENprivacy">Privacy Policy</a>
+            <a href="/ENabout">About</a>
+        </div>
+    </footer>
+    </body>
+</html>
