@@ -161,14 +161,57 @@ Socket events are handled under namespace `/video` (frame streaming, signaling, 
 
 ## Demo Videos
 
-These demo videos are included in the repository under `demo/`:
+These demo videos are included in `demo/` and can be played directly from the repository.
 
-- [help.mp4](demo/help.mp4)
-- [how.mp4](demo/how.mp4)
-- [mother.mp4](demo/mother.mp4)
-- [see you later.mp4](demo/see%20you%20later.mp4)
+### Demo Gallery (2x2)
+<table>
+  <tr>
+    <td>
+      <strong>Help</strong><br/>
+      <video src="demo/help.mp4" controls width="360"></video><br/>
+      <a href="demo/help.mp4">Open file</a>
+    </td>
+    <td>
+      <strong>How</strong><br/>
+      <video src="demo/how.mp4" controls width="360"></video><br/>
+      <a href="demo/how.mp4">Open file</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>Mother</strong><br/>
+      <video src="demo/mother.mp4" controls width="360"></video><br/>
+      <a href="demo/mother.mp4">Open file</a>
+    </td>
+    <td>
+      <strong>See You Later</strong><br/>
+      <video src="demo/see%20you%20later.mp4" controls width="360"></video><br/>
+      <a href="demo/see%20you%20later.mp4">Open file</a>
+    </td>
+  </tr>
+</table>
 
-If the browser cannot stream directly from GitHub preview, use the **Download** button on each file page.
+### Demo 1 - Help
+<video src="demo/help.mp4" controls width="760"></video>
+
+[Open help.mp4](demo/help.mp4)
+
+### Demo 2 - How
+<video src="demo/how.mp4" controls width="760"></video>
+
+[Open how.mp4](demo/how.mp4)
+
+### Demo 3 - Mother
+<video src="demo/mother.mp4" controls width="760"></video>
+
+[Open mother.mp4](demo/mother.mp4)
+
+### Demo 4 - See You Later
+<video src="demo/see%20you%20later.mp4" controls width="760"></video>
+
+[Open see you later.mp4](demo/see%20you%20later.mp4)
+
+If a preview does not autoplay in the GitHub view, click the video title link to open/download it.
 
 ## Known Notes
 
