@@ -29,6 +29,12 @@ import datetime
 from realtime_sign import process_frame
 from asl_model_detection import initialize_asl_detector, get_asl_detector
 
+# Force UTF-8 console streams on Windows to avoid print-time Unicode crashes.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 
 def handle_exception(exc_type, exc_value, exc_traceback):
     print('Uncaught exception:', exc_value, file=sys.stderr)
@@ -72,12 +78,12 @@ cred = credentials.Certificate('sign-language-f0172-firebase-adminsdk-fbsvc-67cb
 firebase_admin.initialize_app(cred)
 
 # Initialize ASL EfficientNetB0 detector for enhanced sign language detection
-print("🔄 Initializing ASL EfficientNetB0 detector...")
+print("Initializing ASL EfficientNetB0 detector...")
 asl_success = initialize_asl_detector()
 if asl_success:
-    print("✅ ASL EfficientNetB0 detector initialized successfully")
+    print("ASL EfficientNetB0 detector initialized successfully")
 else:
-    print("⚠️ ASL detector initialization failed, falling back to MediaPipe only")
+    print("Warning: ASL detector initialization failed, falling back to MediaPipe only")
 
 # Set up Firestore
 db = firestore.client()

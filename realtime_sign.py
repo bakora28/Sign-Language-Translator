@@ -3,7 +3,11 @@ import os
 import cv2
 import numpy as np
 import mediapipe as mp
-from tensorflow.keras.models import load_model
+from tensorflow import keras
+import h5py
+import json
+import tempfile
+import shutil
 # Arabic processing imports - keeping for potential future use
 # from arabic_reshaper import reshape  
 # from bidi.algorithm import get_display
@@ -23,8 +27,75 @@ hands = mp_hands.Hands(
     static_image_mode=True
 )
 
-# Load model
-modelLSTM = load_model("action3.h5")
+def _create_keras_compat_copy(model_path):
+    """
+    Create a temporary H5 copy where InputLayer config uses batch_input_shape.
+    This works around Keras deserialization differences for older/newer model files.
+    """
+    fd, temp_path = tempfile.mkstemp(prefix="action3_compat_", suffix=".h5")
+    os.close(fd)
+    shutil.copy2(model_path, temp_path)
+
+    with h5py.File(temp_path, "r+") as f:
+        raw_cfg = f.attrs.get("model_config")
+        if raw_cfg is None:
+            return temp_path
+
+        if isinstance(raw_cfg, bytes):
+            cfg_text = raw_cfg.decode("utf-8")
+        else:
+            cfg_text = raw_cfg
+
+        model_cfg = json.loads(cfg_text)
+
+        def patch_batch_shape(node):
+            if isinstance(node, dict):
+                if "batch_shape" in node and "batch_input_shape" not in node:
+                    node["batch_input_shape"] = node.pop("batch_shape")
+                for value in node.values():
+                    patch_batch_shape(value)
+            elif isinstance(node, list):
+                for item in node:
+                    patch_batch_shape(item)
+
+        patch_batch_shape(model_cfg)
+        f.attrs["model_config"] = json.dumps(model_cfg).encode("utf-8")
+
+    return temp_path
+
+
+def _load_lstm_model(model_path):
+    try:
+        return keras.models.load_model(model_path, compile=False)
+    except Exception as load_err:
+        compat_path = None
+        try:
+            compat_path = _create_keras_compat_copy(model_path)
+            return keras.models.load_model(
+                compat_path,
+                compile=False,
+                custom_objects={
+                    "DTypePolicy": keras.mixed_precision.Policy,
+                    "Policy": keras.mixed_precision.Policy,
+                },
+            )
+        except Exception as compat_err:
+            print(
+                "Warning: Failed to load action3.h5. "
+                f"Primary error: {load_err}; Compatibility error: {compat_err}. "
+                "Starting without LSTM predictions."
+            )
+            return None
+        finally:
+            if compat_path and os.path.exists(compat_path):
+                try:
+                    os.remove(compat_path)
+                except OSError:
+                    pass
+
+
+# Load model with compatibility fallbacks; do not fail server startup
+modelLSTM = _load_lstm_model("action3.h5")
 
 # Actions and translations
 actions = ['Act', 'Alhamdullah', 'all', 'Baba', 'Basis', 'because', 'Boy', 'Brave', 'calls', 'calm',
@@ -112,7 +183,7 @@ def extract_keypoints(results):
 
 def process_frame(frame, sequence, sentence, last_update_time, threshold=0.95):
     image, results = mediapipe_detection(frame, hands)
-    if results.multi_hand_landmarks:
+    if results.multi_hand_landmarks and modelLSTM is not None:
         keypoints = extract_keypoints(results)
         if len(keypoints) == 84:
             sequence.append(keypoints)
@@ -120,7 +191,7 @@ def process_frame(frame, sequence, sentence, last_update_time, threshold=0.95):
                 res = modelLSTM.predict(np.expand_dims(sequence, axis=0))[0]
                 EN = actions[np.argmax(res)]
                 confidence = res[np.argmax(res)]
-                print(f"Predicted: {reverb[EN]} with confidence {confidence}")
+                print(f"Predicted token: {EN} confidence: {confidence:.4f}")
                 if confidence > threshold:
                     if not sentence or reverb[EN] != sentence[-1][0]:
                         sentence.append((reverb[EN], confidence))
@@ -138,12 +209,9 @@ def process_frame(frame, sequence, sentence, last_update_time, threshold=0.95):
 
     # Process Arabic text for frontend display (no frame overlay needed)
     if sentence:
-        # Join the individual Arabic words in detection order
+        # Join detected words in detection order (frontend handles RTL display)
         arabic_words = [word[0] for word in sentence]
-        
-        # Simple approach: just join the words - browser handles RTL correctly
         reshaped_sentence = ' '.join(arabic_words)
-        print(f"🔤 Arabic sentence: '{reshaped_sentence}'")
     else:
         reshaped_sentence = ""
     
