@@ -161,57 +161,35 @@ Socket events are handled under namespace `/video` (frame streaming, signaling, 
 
 ## Demo Videos
 
-These demo videos are included in `demo/` and can be played directly from the repository.
+These demos are shown as inline GIF previews. Click any preview to open the full MP4.
 
 ### Demo Gallery (2x2)
 <table>
   <tr>
     <td>
       <strong>Help</strong><br/>
-      <video src="demo/help.mp4" controls width="360"></video><br/>
+      <a href="demo/help.mp4"><img src="demo/previews/help-preview.gif" width="360" alt="Help demo preview"/></a><br/>
       <a href="demo/help.mp4">Open file</a>
     </td>
     <td>
       <strong>How</strong><br/>
-      <video src="demo/how.mp4" controls width="360"></video><br/>
+      <a href="demo/how.mp4"><img src="demo/previews/how-preview.gif" width="360" alt="How demo preview"/></a><br/>
       <a href="demo/how.mp4">Open file</a>
     </td>
   </tr>
   <tr>
     <td>
       <strong>Mother</strong><br/>
-      <video src="demo/mother.mp4" controls width="360"></video><br/>
+      <a href="demo/mother.mp4"><img src="demo/previews/mother-preview.gif" width="360" alt="Mother demo preview"/></a><br/>
       <a href="demo/mother.mp4">Open file</a>
     </td>
     <td>
       <strong>See You Later</strong><br/>
-      <video src="demo/see%20you%20later.mp4" controls width="360"></video><br/>
+      <a href="demo/see%20you%20later.mp4"><img src="demo/previews/see-you-later-preview.gif" width="360" alt="See you later demo preview"/></a><br/>
       <a href="demo/see%20you%20later.mp4">Open file</a>
     </td>
   </tr>
 </table>
-
-### Demo 1 - Help
-<video src="demo/help.mp4" controls width="760"></video>
-
-[Open help.mp4](demo/help.mp4)
-
-### Demo 2 - How
-<video src="demo/how.mp4" controls width="760"></video>
-
-[Open how.mp4](demo/how.mp4)
-
-### Demo 3 - Mother
-<video src="demo/mother.mp4" controls width="760"></video>
-
-[Open mother.mp4](demo/mother.mp4)
-
-### Demo 4 - See You Later
-<video src="demo/see%20you%20later.mp4" controls width="760"></video>
-
-[Open see you later.mp4](demo/see%20you%20later.mp4)
-
-If a preview does not autoplay in the GitHub view, click the video title link to open/download it.
 
 ## Known Notes
 
