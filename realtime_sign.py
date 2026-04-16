@@ -95,7 +95,8 @@ def _load_lstm_model(model_path):
 
 
 # Load model with compatibility fallbacks; do not fail server startup
-modelLSTM = _load_lstm_model("action3.h5")
+MODEL_LSTM_PATH = os.path.join("models", "action3.h5")
+modelLSTM = _load_lstm_model(MODEL_LSTM_PATH)
 
 # Actions and translations
 actions = ['Act', 'Alhamdullah', 'all', 'Baba', 'Basis', 'because', 'Boy', 'Brave', 'calls', 'calm',

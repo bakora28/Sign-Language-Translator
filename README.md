@@ -77,6 +77,9 @@ sign-language-translator/
 ├── app.py
 ├── realtime_sign.py
 ├── asl_model_detection.py
+├── docs/
+├── scripts/
+├── models/
 ├── templates/
 ├── static/
 │   ├── asl_videos/
@@ -91,12 +94,12 @@ sign-language-translator/
 
 ## Important Model / Asset Files
 
-The app expects several trained assets to be present in the repository root (or referenced paths), including:
+The app expects trained assets in `models/`, including:
 
-- `action3.h5`
-- `asl_model_efficientnetb000.h5`
-- `mobilenet_arabic_sign_model.h5`
-- `svm_asl_model.joblib`
+- `models/action3.h5`
+- `models/asl_model_efficientnetb000.h5`
+- `models/mobilenet_arabic_sign_model.h5`
+- `models/svm_asl_model.joblib`
 - `arial.ttf`
 - Firebase service account JSON file used by `app.py`
 
@@ -183,12 +186,12 @@ Socket events are handled under namespace `/video` (frame streaming, signaling, 
 - On Windows, verify camera access in:
   - Settings -> Privacy -> Camera
   - Browser site permissions
-- See `CAMERA_TROUBLESHOOTING.md` for full diagnostics.
+- See `docs/CAMERA_TROUBLESHOOTING.md` for full diagnostics.
 
 ## ASL Video / GIF Setup
 
-- English ASL setup: `ASL_SETUP_README.md`
-- English integration details: `ENGLISH_INTEGRATION_README.md`
+- English ASL setup: `docs/ASL_SETUP_README.md`
+- English integration details: `docs/ENGLISH_INTEGRATION_README.md`
 - Required ASL source list: `static/asl_videos/required_videos.txt`
 
 ## Known Notes

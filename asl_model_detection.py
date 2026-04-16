@@ -14,12 +14,12 @@ import mediapipe as mp
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 class ASLModelDetector:
-    def __init__(self, model_path="asl_model_efficientnetb000.h5", confidence_threshold=0.7):
+    def __init__(self, model_path=os.path.join("models", "asl_model_efficientnetb000.h5"), confidence_threshold=0.7):
         """
         Initialize ASL EfficientNetB0 + LSTM detector (aligned with notebook)
         
         Args:
-            model_path: Path to trained ASL model (default: asl_model_efficientnetb000.h5)
+            model_path: Path to trained ASL model (default: models/asl_model_efficientnetb000.h5)
             confidence_threshold: Minimum confidence for valid predictions
         """
         self.model_path = model_path
@@ -378,7 +378,7 @@ class ASLModelDetector:
 # Global detector instance
 asl_detector = None
 
-def initialize_asl_detector(model_path="asl_model_efficientnetb000.h5", confidence_threshold=0.7):
+def initialize_asl_detector(model_path=os.path.join("models", "asl_model_efficientnetb000.h5"), confidence_threshold=0.7):
     """Initialize global ASL detector"""
     global asl_detector
     try:

@@ -214,10 +214,12 @@ If you have an existing `video_utils.py` with `create_sentence_video()` function
 - Follow accessibility guidelines for deaf/hard-of-hearing users
 """
     
-    with open('ASL_SETUP_README.md', 'w', encoding='utf-8') as f:
+    os.makedirs('docs', exist_ok=True)
+    readme_path = os.path.join('docs', 'ASL_SETUP_README.md')
+    with open(readme_path, 'w', encoding='utf-8') as f:
         f.write(readme_content)
     
-    print(f"✅ Created comprehensive README: ASL_SETUP_README.md")
+    print(f"✅ Created comprehensive README: {readme_path}")
 
 def main():
     """Main setup function"""
@@ -247,7 +249,7 @@ def main():
     print(f"\n📋 Next steps:")
     print(f"   1. Check: {os.path.join(asl_dir, 'required_videos.txt')}")
     print(f"   2. Add ASL video files to: {asl_dir}")
-    print(f"   3. Read: ASL_SETUP_README.md for detailed instructions")
+    print(f"   3. Read: docs/ASL_SETUP_README.md for detailed instructions")
     print(f"   4. Test: Access /ENtest-video in your application")
     
     print(f"\n🎯 Priority videos to add first:")

@@ -390,7 +390,7 @@ hands = mp_hands.Hands(
 )
 # Load LSTM model with error handling
 try:
-    modelLSTM = load_model("action3.h5")
+    modelLSTM = load_model(os.path.join("models", "action3.h5"))
     print("✅ LSTM model loaded successfully")
 except Exception as e:
     print(f"⚠️ Failed to load LSTM model: {e}")
@@ -745,11 +745,11 @@ class EnglishHandler:
     def __init__(self):
         try:
             self.models = {
-                'SVM': joblib.load('svm_asl_model.joblib')
+                'SVM': joblib.load(os.path.join('models', 'svm_asl_model.joblib'))
             }
             print("English model loaded successfully.")
         except FileNotFoundError:
-            print("⚠️ Error: Model file 'svm_asl_model.joblib' not found. Running in fallback mode.")
+            print("⚠️ Error: Model file 'models/svm_asl_model.joblib' not found. Running in fallback mode.")
             self.models = {}
         except Exception as e:
             print(f"⚠️ Error loading English model: {e}. Running in fallback mode.")
@@ -778,7 +778,7 @@ class ArabicHandler:
                 20: "س", 21: "ش", 22: "ط", 23: "ت", 24: "ة", 25: "ذ", 26: "ث", 27: "و", 28: "ي", 29: "ظ", 30: "ز"
             }
             self.models = {
-                'MobileNet_Arabic': tf.keras.models.load_model('mobilenet_arabic_sign_model.h5')
+                'MobileNet_Arabic': tf.keras.models.load_model(os.path.join('models', 'mobilenet_arabic_sign_model.h5'))
             }
             print("Arabic MobileNet model loaded successfully.")
         except FileNotFoundError:
