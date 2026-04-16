@@ -7,6 +7,38 @@ Realtime sign language recognition and communication platform with Arabic/Englis
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-Realtime-green)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
+## Demo Videos
+
+These demos are shown as inline GIF previews. Click any preview to open the full MP4.
+
+### Demo Gallery (2x2)
+<table>
+  <tr>
+    <td>
+      <strong>Help</strong><br/>
+      <a href="demo/help.mp4"><img src="demo/previews/help-preview.gif" width="360" alt="Help demo preview"/></a><br/>
+      <a href="demo/help.mp4">Open file</a>
+    </td>
+    <td>
+      <strong>How</strong><br/>
+      <a href="demo/how.mp4"><img src="demo/previews/how-preview.gif" width="360" alt="How demo preview"/></a><br/>
+      <a href="demo/how.mp4">Open file</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>Mother</strong><br/>
+      <a href="demo/mother.mp4"><img src="demo/previews/mother-preview.gif" width="360" alt="Mother demo preview"/></a><br/>
+      <a href="demo/mother.mp4">Open file</a>
+    </td>
+    <td>
+      <strong>See You Later</strong><br/>
+      <a href="demo/see%20you%20later.mp4"><img src="demo/previews/see-you-later-preview.gif" width="360" alt="See you later demo preview"/></a><br/>
+      <a href="demo/see%20you%20later.mp4">Open file</a>
+    </td>
+  </tr>
+</table>
+
 ## Overview
 
 This project combines:
@@ -158,38 +190,6 @@ Socket events are handled under namespace `/video` (frame streaming, signaling, 
 - English ASL setup: `ASL_SETUP_README.md`
 - English integration details: `ENGLISH_INTEGRATION_README.md`
 - Required ASL source list: `static/asl_videos/required_videos.txt`
-
-## Demo Videos
-
-These demos are shown as inline GIF previews. Click any preview to open the full MP4.
-
-### Demo Gallery (2x2)
-<table>
-  <tr>
-    <td>
-      <strong>Help</strong><br/>
-      <a href="demo/help.mp4"><img src="demo/previews/help-preview.gif" width="360" alt="Help demo preview"/></a><br/>
-      <a href="demo/help.mp4">Open file</a>
-    </td>
-    <td>
-      <strong>How</strong><br/>
-      <a href="demo/how.mp4"><img src="demo/previews/how-preview.gif" width="360" alt="How demo preview"/></a><br/>
-      <a href="demo/how.mp4">Open file</a>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <strong>Mother</strong><br/>
-      <a href="demo/mother.mp4"><img src="demo/previews/mother-preview.gif" width="360" alt="Mother demo preview"/></a><br/>
-      <a href="demo/mother.mp4">Open file</a>
-    </td>
-    <td>
-      <strong>See You Later</strong><br/>
-      <a href="demo/see%20you%20later.mp4"><img src="demo/previews/see-you-later-preview.gif" width="360" alt="See you later demo preview"/></a><br/>
-      <a href="demo/see%20you%20later.mp4">Open file</a>
-    </td>
-  </tr>
-</table>
 
 ## Known Notes
 
